@@ -18,11 +18,10 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
+
           "options": {
-            "outputPath": {
-              "base": "dist/angular-tailwind"
-            },
+            "outputPath": "dist",
             "index": "src/index.html",
             "polyfills": [
               "src/polyfills.ts"
@@ -42,7 +41,7 @@
             "allowedCommonJsDependencies": [
               "apexcharts"
             ],
-            "browser": "src/main.ts"
+            "main": "src/main.ts"
           },
           "configurations": {
             "production": {
