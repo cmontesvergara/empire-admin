@@ -9,7 +9,7 @@ RUN apk update && apk upgrade && \
     echo $TZ > /etc/timezone
 
 # Instala una versión específica de npm globalmente
-RUN npm install --global npm@9.8.0
+RUN npm install --global npm@10.8.2
 
 # Crea y configura el directorio de trabajo
 WORKDIR /usr/pre-app
