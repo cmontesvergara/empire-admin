@@ -18,5 +18,5 @@ COPY . /usr/app/
 
 RUN npm install && npm cache clean --force
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "80"]
 
