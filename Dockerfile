@@ -23,7 +23,7 @@ FROM nginx:stable-alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copiar archivos construidos desde la etapa anterior
-COPY --from=build /app/dist/[nombre-de-tu-aplicacion] /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copiar archivo personalizado de configuración de NGINX
 COPY nginx.conf /etc/nginx/conf.d/default.conf
