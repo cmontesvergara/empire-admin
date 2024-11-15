@@ -1,5 +1,5 @@
 # Usa una imagen base de Node.js con Alpine
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Configura la zona horaria y elimina el paquete tzdata después de usarlo
 ENV TZ America/Bogota
