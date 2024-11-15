@@ -12,22 +12,16 @@ RUN apk update && apk upgrade && \
 RUN npm install --global npm@9.8.0
 
 # Crea y configura el directorio de trabajo
-WORKDIR /usr/app
+WORKDIR /usr/pre-app
 
 # Copia el package.json antes de instalar dependencias
-COPY ./package.json /usr/app/
+COPY ./package.json /usr/pre-app/
 RUN npm install && npm cache clean --force
 
 # Copia el resto de los archivos de la aplicación y construye el proyecto
-COPY ./ /usr/app
+COPY ./ /usr/pre-app
 RUN npm run build
 ENV NODE_ENV production
-#RUN mkdir -p /usr/app/build/pages
-#COPY ./src/pages/ /usr/app/build/pages/
+WORKDIR /usr/app
+COPY /usr/pre-app/dist /usr/app
 
-# Configura el entorno de producción y expone el puerto
-ENV PORT 80
-EXPOSE 80
-
-# Ejecutar
-CMD [ "npm", "run","watch" ]
