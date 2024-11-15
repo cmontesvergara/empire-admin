@@ -14,7 +14,7 @@ RUN npm install -g @angular/cli
 WORKDIR /usr/app
 
 
-COPY ./package.json /usr/app/
+COPY . /usr/app/
 
 RUN npm install && npm cache clean --force
 
