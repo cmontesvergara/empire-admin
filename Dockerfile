@@ -21,7 +21,7 @@ RUN npm install && npm cache clean --force
 # Copia el resto de los archivos de la aplicación y construye el proyecto
 COPY ./ /usr/pre-app
 RUN npm run build
-ENV NODE_ENV production
-WORKDIR /usr/app
-COPY /usr/pre-app/dist /usr/app
+# ENV NODE_ENV production
+# WORKDIR /usr/app
+# COPY /usr/pre-app/dist /usr/app
 
