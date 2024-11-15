@@ -22,6 +22,6 @@ RUN npm install && npm cache clean --force
 COPY ./ /usr/pre-app
 RUN npm run build
 # ENV NODE_ENV production
-# WORKDIR /usr/app
-# COPY /usr/pre-app/dist /usr/app
+ WORKDIR /usr/app
+ COPY /usr/pre-app/dist/. /usr/app
 
