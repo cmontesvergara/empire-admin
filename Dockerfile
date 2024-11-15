@@ -1,22 +1,36 @@
-# Usa una imagen base de Node.js con Alpine
-FROM node:20-alpine
+# Etapa 1: Construcción
+FROM node:20 AS build
 
-# Configura la zona horaria y elimina el paquete tzdata después de usarlo
-ENV TZ America/Bogota
-RUN apk update && apk upgrade && \
-    apk add --no-cache git tzdata && \
-    cp /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
+# Establecer directorio de trabajo
+WORKDIR /app
 
-RUN npm install --global npm@10.9.0
-RUN npm install -g @angular/cli
+# Copiar archivos del proyecto
+COPY package*.json ./
 
-WORKDIR /usr/app
+# Instalar dependencias
+RUN npm install
 
+# Copiar el resto de los archivos de la aplicación
+COPY . .
 
-COPY . /usr/app/
+# Construir la aplicación Angular para producción
+RUN npm run build -- --configuration production
 
-RUN npm install && npm cache clean --force
+# Etapa 2: Configuración del servidor
+FROM nginx:stable-alpine
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "80", "--disable-host-check"]
+# Eliminar configuración predeterminada de NGINX
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copiar archivos construidos desde la etapa anterior
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copiar archivo personalizado de configuración de NGINX
+#COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Exponer el puerto 80
+EXPOSE 80
+
+# Comando por defecto
+CMD ["nginx", "-g", "daemon off;"]
 
