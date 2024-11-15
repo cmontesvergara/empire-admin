@@ -18,5 +18,5 @@ COPY ./package.json /usr/app/
 
 RUN npm install && npm cache clean --force
 
-CMD [ "npm", "run","start" ]
+CMD ["ng", "serve", "--host", "0.0.0.0"]
 
