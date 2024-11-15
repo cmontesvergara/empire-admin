@@ -12,7 +12,17 @@ export class Menu {
           route: '/dashboard',
           children: [
             { label: 'Nfts', route: '/dashboard/nfts' },
-            // { label: 'Podcast', route: '/dashboard/podcast' },
+             { label: 'Podcast', route: '/dashboard/podcast' },
+          ],
+        },
+        {
+          icon: 'assets/icons/heroicons/outline/lock-closed.svg',
+          label: 'Apps',
+          route: '/apps',
+          children: [
+            { label: 'Css Unit Changer', route: '/apps/css-unit-changer' },
+            { label: 'File Renamer', route: '/apps/file-renamer' },
+
           ],
         },
         {
