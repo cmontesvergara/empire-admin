@@ -8,7 +8,8 @@ RUN apk update && apk upgrade && \
     cp /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
-RUN npm install --global npm@10.9.0 &&  -g @angular/cli
+RUN npm install --global npm@10.9.0
+RUN npm install -g @angular/cli
 
 WORKDIR /usr/app
 
