@@ -8,20 +8,14 @@ RUN apk update && apk upgrade && \
     cp /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
-# Instala una versión específica de npm globalmente
-RUN npm install --global npm@10.9.0
+RUN npm install --global npm@10.9.0 &&  -g @angular/cli
 
-# Crea y configura el directorio de trabajo
-WORKDIR /usr/pre-app
+WORKDIR /usr/app
 
-# Copia el package.json antes de instalar dependencias
-COPY ./package.json /usr/pre-app/
+
+COPY ./package.json /usr/app/
+
 RUN npm install && npm cache clean --force
 
-# Copia el resto de los archivos de la aplicación y construye el proyecto
-COPY ./ /usr/pre-app
-RUN npm run build
-# ENV NODE_ENV production
- WORKDIR /usr/app
- COPY /usr/pre-app/dist/. /usr/app
+CMD [ "npm", "run","start" ]
 
