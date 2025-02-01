@@ -1,4 +1,4 @@
-<form class="my-10 space-y-6">
+<form [formGroup]="signUpForm" class="my-10 space-y-6" (ngSubmit)="onSubmit()">
   <div class="text-center">
     <h2 class="mb-1 text-3xl font-semibold text-foreground">Sign Up <span class="text-primary">!</span></h2>
     <p class="text-sm text-muted-foreground">Let's get started with your 30 day free trial</p>
@@ -18,7 +18,39 @@
 
   <div class="space-y-3 text-left">
     <div class="relative">
-      <input type="text" id="email" class="peer block" placeholder=" " />
+      <input type="text" id="name" formControlName="name" class="peer block" placeholder=" " />
+      <label
+        for="name"
+        class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
+        Nombre
+      </label>
+    </div>
+    <div class="relative">
+      <input type="text" id="last_name" formControlName="last_name" class="peer block" placeholder=" " />
+      <label
+        for="last_name"
+        class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
+        Apellido
+      </label>
+    </div>
+    <div class="relative">
+      <input type="text" id="nit" formControlName="nit" class="peer block" placeholder=" " />
+      <label
+        for="nit"
+        class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
+        Numero de Identificación
+      </label>
+    </div>
+    <div class="relative">
+      <input type="text" id="phone" formControlName="phone" class="peer block" placeholder=" " />
+      <label
+        for="phone"
+        class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
+        Numero de Telefono
+      </label>
+    </div>
+    <div class="relative">
+      <input type="text" id="email" formControlName="email" class="peer block" placeholder=" " />
       <label
         for="email"
         class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
@@ -26,7 +58,7 @@
       </label>
     </div>
     <div class="relative">
-      <input type="password" id="password" class="peer block" placeholder=" " />
+      <input type="password" id="password" formControlName="password" class="peer block" placeholder=" " />
       <label
         for="password"
         class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
@@ -48,7 +80,7 @@
       Use 8 or more characters with a mix of letters, numbers & symbols.
     </span>
     <div class="relative">
-      <input type="password" id="confirm-password" class="peer block" placeholder=" " />
+      <input type="password" id="confirm-password" formControlName="confirmPassword" class="peer block" placeholder=" " />
       <label
         for="confirm-password"
         class="absolute top-2 left-1 z-10 origin-[0] -translate-y-4 scale-95 transform bg-background px-2 text-sm text-muted-foreground duration-300 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-2 peer-focus:-translate-y-4 peer-focus:scale-95 peer-focus:px-2 peer-focus:text-primary">
@@ -59,7 +91,7 @@
 
   <div class="flex items-center justify-between space-x-3">
     <div class="flex items-center gap-1">
-      <input id="accept-term" name="accept-term" type="checkbox" />
+      <input id="accept-term" name="accept-term" type="checkbox" formControlName="acceptTerms" />
       <label for="accept-term" class="ml-2 block text-sm text-muted-foreground"> I Accept the </label>
       <app-button impact="none" tone="primary" shape="rounded" size="small"> Terms </app-button>
     </div>
@@ -67,7 +99,8 @@
 
   <!-- Submit Button -->
   <div>
-    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">Sign up</app-button>
+    <app-button full impact="bold" tone="primary" shape="rounded" size="medium"
+    >Sign up</app-button>
   </div>
 
   <!-- Sign-up -->
