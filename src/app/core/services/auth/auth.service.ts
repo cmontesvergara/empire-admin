@@ -20,4 +20,23 @@ export class AuthService {
   signUp(values: any) {
     return this.http.post(`${this.baseUrl}/api/v1/user/create`, values);
   }
+
+  sendEmailOtpCode(nit: string) {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/verify/send_email_code`,
+      {
+        credentials: {
+          nit
+        }
+      },
+    );
+  }
+  validateEmailOtpCode(nit: string, code: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/verify/email_code`, {
+      credentials: {
+        nit,
+      },
+      code
+    });
+  }
 }

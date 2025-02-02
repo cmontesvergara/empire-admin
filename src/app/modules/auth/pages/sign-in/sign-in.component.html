@@ -44,7 +44,7 @@
         <input
           [type]="passwordTextType ? 'text' : 'password'"
           id="password"
-          [ngClass]="{ 'is__invalid-input': submitted && f['nit'].errors }"
+          [ngClass]="{ 'is__invalid-input': submitted && f['password'].errors }"
           class="peer block"
           placeholder=" "
           formControlName="password" />
@@ -83,7 +83,7 @@
 
   <!-- Submit Button -->
   <div>
-    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">Sign in</app-button>
+    <app-button full [disabled]="this.form.invalid" impact="bold" tone="primary" shape="rounded" size="medium">Sign in</app-button>
   </div>
 
   <!-- Sign-up -->

@@ -1,0 +1,25 @@
+<form class="my-10 space-y-6" (ngSubmit)="onSubmit()">
+  <div class="text-center">
+    <h2 class="mb-1 text-3xl font-semibold text-foreground">Verifica tu cuenta</h2>
+    <p class="text-sm text-muted-foreground">Ingresa el código OTP enviado al correo que pusiste cuando te registraste con el NIT</p>
+    <div class="mt-2 text-lg text-muted-foreground">{{nit}}</div>
+  </div>
+
+  <div class="grid grid-cols-6">
+    @for (item of inputs; track $index) {
+    <input
+    [id]="'input-'+ $index"
+      (input)="onInputChange($event, $index)"
+      placeholder=""
+      maxlength="1"
+      class="h-10 w-10 rounded-md border border-border bg-background text-center text-muted-foreground outline-none focus:border-primary sm:h-14 sm:w-14" />
+    }
+  </div>
+
+  <!-- Submit Button -->
+  <div>
+    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">
+      Verificar
+    </app-button>
+  </div>
+</form>
