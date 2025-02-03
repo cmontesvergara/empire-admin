@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -16,11 +17,15 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
     RouterLink,
     AngularSvgIconModule,
     ButtonComponent,
+    CommonModule,
   ],
   providers: [AuthService],
 })
 export class SignUpComponent implements OnInit {
   signUpForm!: FormGroup;
+  passwordStrength: number = 0;
+
+  passwordTextType!: boolean;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -28,18 +33,87 @@ export class SignUpComponent implements OnInit {
     private readonly router: Router,
   ) {
     this.signUpForm = this.fb.group({
-      name: ['', Validators.required],
-      last_name: ['', Validators.required],
-      nit: ['', Validators.required],
-      phone: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      last_name: ['', [Validators.required, Validators.minLength(3)]],
+      second_last_name: ['', [Validators.minLength(3)]],
+      nit: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.maxLength(10),
+        ],
+      ],
+      phone: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(10),
+          Validators.pattern(/^3/),
+        ],
+      ],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
+      password: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(16),
+          Validators.pattern(/^[A-Za-z0-9!@#$%^&*()_+{}\[\]:;"<>,.?/~`-]+$/),
+        ],
+      ],
+      confirmPassword: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.maxLength(16),
+          Validators.pattern(/^[A-Za-z0-9!@#$%^&*()_+{}\[\]:;"<>,.?/~`-]+$/),
+        ],
+      ],
       acceptTerms: [false, Validators.requiredTrue],
+    });
+
+    this.signUpForm.get('phone')?.valueChanges.subscribe((value) => {
+      this.sanitizedNumberField('phone', value);
+    });
+    this.signUpForm.get('nit')?.valueChanges.subscribe((value) => {
+      this.sanitizedNumberField('nit', value);
+    });
+    this.signUpForm.get('name')?.valueChanges.subscribe((value) => {
+      this.sanitizedTextField('name', value);
+    });
+    this.signUpForm.get('last_name')?.valueChanges.subscribe((value) => {
+      this.sanitizedTextField('last_name', value);
+    });
+  }
+  sanitizedNumberField(fieldName: string, value: string) {
+    const sanitizedValue = value.replace(/[^0-9]/g, '');
+    if (value !== sanitizedValue) {
+      this.signUpForm
+        .get(fieldName)
+        ?.setValue(sanitizedValue, { emitEvent: false });
+    }
+  }
+  sanitizedTextField(fieldName: string, value: string) {
+    const sanitizedValue = value.replace(/[^A-Za-z]/g, '');
+    if (value !== sanitizedValue) {
+      this.signUpForm
+        .get(fieldName)
+        ?.setValue(sanitizedValue, { emitEvent: false });
+    }
+  }
+
+  ngOnInit(): void {
+    this.signUpForm.valueChanges.subscribe(() => {
+      console.log(this.signUpForm);
     });
   }
 
-  ngOnInit(): void {}
+  get f() {
+    return this.signUpForm.controls;
+  }
   onSubmit() {
     if (
       this.signUpForm.value.password ===
@@ -47,23 +121,38 @@ export class SignUpComponent implements OnInit {
       this.signUpForm.value.acceptTerms &&
       this.signUpForm.valid
     ) {
+      if (this.signUpForm.value.last_name.trim().includes(' ')) {
+        const [last_name, second_last_name] = this.signUpForm.value.last_name
+          .trim()
+          .split(' ');
+        this.signUpForm.value.last_name = last_name;
+        this.signUpForm.value.second_last_name = second_last_name;
+      }
       const payload = {
         user: {
           basic_information: {
-            name: this.signUpForm.value.name,
-            last_name: this.signUpForm.value.last_name,
-            phone: this.signUpForm.value.phone,
-            email: this.signUpForm.value.email,
-            nit: this.signUpForm.value.nit,
+            name: this.signUpForm.value.name.trim().toUpperCase(),
+            last_name: this.signUpForm.value.last_name.trim().toUpperCase(),
+            second_last_name: this.signUpForm.value?.second_last_name
+              ?.trim()
+              ?.toUpperCase(),
+            phone: this.signUpForm.value.phone.trim(),
+            email: this.signUpForm.value.email.trim().toLowerCase(),
+            nit: this.signUpForm.value.nit.trim(),
           },
           secure_information: {
-            password: this.signUpForm.value.confirmPassword,
+            password: this.signUpForm.value.confirmPassword.trim(),
           },
         },
       };
       this.authService.signUp(payload).subscribe(
         (res) => {
-          this.router.navigate(['/auth/sign-in']);
+          const signData = {
+            nit: payload.user.basic_information.nit,
+            password: payload.user.secure_information.password,
+          };
+          sessionStorage.setItem('sign-data', JSON.stringify(signData));
+          this.router.navigate(['/auth/email-verification']);
         },
         (err) => {
           console.log(err);
@@ -71,7 +160,19 @@ export class SignUpComponent implements OnInit {
       );
     } else {
       console.log('Form invalid');
-      console.log(this.signUpForm);
     }
+  }
+  passwordStrongLevel() {
+    const password = this.signUpForm.get('password')?.value;
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    this.passwordStrength = strength;
+  }
+
+  togglePasswordTextType() {
+    this.passwordTextType = !this.passwordTextType;
   }
 }

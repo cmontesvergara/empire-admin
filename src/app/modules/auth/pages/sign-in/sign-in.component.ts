@@ -18,10 +18,6 @@ export class SignInComponent implements OnInit {
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
-
-
-
-
     constructor(
       private readonly _formBuilder: FormBuilder,
       private readonly _router: Router,
@@ -86,13 +82,25 @@ export class SignInComponent implements OnInit {
         ) {
           this.authService.sendEmailOtpCode(nit).subscribe(
             (res) => {
-              sessionStorage.setItem('sign-in-nit', nit)
-              sessionStorage.setItem('sign-in-pass', password)
+              const signData = {
+                nit,
+                password
+              }
+              sessionStorage.setItem('sign-data', JSON.stringify(signData));
               this._router.navigate(['/auth/email-verification']);
             },
             (err) => {
-              console.log(err);
-              alert('Error al enviar el codigo de verificacion');
+
+              if (
+                error?.error?.code === 403 &&
+                error?.error?.resultCode === 'FORBIDDEN'
+              ) {
+                alert('Usuario bloquedo temporalmente, intenta mas tarde');
+              } else {
+
+                alert('Error al enviar el codigo de verificacion, intenta mas tarde');
+              }
+
             }
           )
 

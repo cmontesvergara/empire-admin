@@ -1,10 +1,8 @@
 import { CanActivateFn } from '@angular/router';
 
 export const emailVerificationGuard: CanActivateFn = (route, state) => {
-  const nit = sessionStorage.getItem('sign-in-nit');
-  const pass = sessionStorage.getItem('sign-in-pass');
-  if (nit && pass) {
-
+  const { nit, password } = JSON.parse(sessionStorage.getItem('sign-data') || '{}');
+  if (nit && password) {
     return true;
   }
   return false;
