@@ -29,6 +29,13 @@ export class AuthService {
       },
     });
   }
+  sendEmailRecovery(nit: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/verify/send_email_recovery`, {
+      credentials: {
+        nit,
+      },
+    });
+  }
   validateEmailOtpCode(nit: string, code: string ) {
     return this.http.post(`${this.baseUrl}/api/v1/verify/email_code`, {
       credentials: {
