@@ -109,8 +109,8 @@
       [type]="passwordTextType ? 'text' : 'password'"
       [ngClass]="{
         'is__invalid-input focus:ring-transparent':
-        f['confirmPassword'].dirty &&  f['confirmPassword'].errors  ||
-        f['confirmPassword'].value !== f['password'].value
+        f['confirmPassword'].dirty && ( f['confirmPassword'].errors  ||
+        f['confirmPassword'].value !== f['password'].value )
 
        }"
        type="password" id="confirm-password"

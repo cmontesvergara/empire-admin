@@ -72,8 +72,8 @@
 
   <div class="mb-2 flex items-center justify-between space-x-3">
     <div class="flex items-center">
-      <input id="remember-me" name="remember-me" type="checkbox" />
-      <label for="remember-me" class="ml-2 block text-sm text-muted-foreground"> Recuérdame </label>
+      <input id="remember-me" name="remember-me" type="checkbox" (click)="toggleRememberButton()"  formControlName="remember"/>
+      <label for="remember-me"  class="ml-2 block text-sm text-muted-foreground"> Recuérdame </label>
     </div>
 
     <app-button routerLink="/auth/forgot-password" impact="none" tone="primary" shape="rounded" size="small">
