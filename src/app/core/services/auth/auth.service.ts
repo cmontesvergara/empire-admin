@@ -29,6 +29,15 @@ export class AuthService {
       },
     });
   }
+  validateEmailRecovery(newPassword: string, otp: string) {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/verify/validate_email_recovery`,
+      {
+        newPassword,
+        otp,
+      },
+    );
+  }
   sendEmailRecovery(nit: string) {
     return this.http.post(`${this.baseUrl}/api/v1/verify/send_email_recovery`, {
       credentials: {
@@ -36,7 +45,7 @@ export class AuthService {
       },
     });
   }
-  validateEmailOtpCode(nit: string, code: string ) {
+  validateEmailOtpCode(nit: string, code: string) {
     return this.http.post(`${this.baseUrl}/api/v1/verify/email_code`, {
       credentials: {
         nit,
