@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { SessionStorageService } from 'src/app/core/services/session-storage/session-storage.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
@@ -31,6 +32,7 @@ export class SignUpComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly sessionStorageService: SessionStorageService,
   ) {
     this.signUpForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -151,7 +153,7 @@ export class SignUpComponent implements OnInit {
             nit: payload.user.basic_information.nit,
             password: payload.user.secure_information.password,
           };
-          sessionStorage.setItem('sign-data', JSON.stringify(signData));
+          this.sessionStorageService.saveSignData(signData);
           this.router.navigate(['/auth/email-verification']);
         },
         (err) => {

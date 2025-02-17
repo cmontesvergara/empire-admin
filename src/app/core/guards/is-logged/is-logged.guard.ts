@@ -1,8 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { SessionStorageService } from '../../services/session-storage/session-storage.service';
 
 export const isLoggedGuard: CanActivateFn = (route, state) => {
-  const access_token = sessionStorage.getItem('access_token');
+  const sessionStorageService  = inject(SessionStorageService);
+  const access_token = sessionStorageService.getAccessToken();
   if (access_token && access_token.split('.').length === 3) {
     return true;
   }

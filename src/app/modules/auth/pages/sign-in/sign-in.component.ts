@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { LocalStorageService } from 'src/app/core/services/local-storage/local-storage.service';
+import { SessionStorageService } from 'src/app/core/services/session-storage/session-storage.service';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 
 @Component({
@@ -29,10 +30,11 @@ export class SignInComponent implements OnInit {
   passwordTextType!: boolean;
   constructor(
     private readonly _formBuilder: FormBuilder,
-    private readonly _router: Router,
+    private readonly router: Router,
     private readonly authService: AuthService,
     private readonly route: ActivatedRoute,
     private readonly localStorageService: LocalStorageService,
+    private readonly sessionStorageService: SessionStorageService,
   ) {
     this.form = this._formBuilder.group({
       nit: ['', [Validators.required, Validators.maxLength(10)]],
@@ -42,8 +44,8 @@ export class SignInComponent implements OnInit {
 
     this.form.controls['remember'].valueChanges.subscribe((value) => {
       if (!value) {
-          this.form.reset();
-          this.localStorageService.removeRememberLoginCredentials();
+        this.form.reset();
+        this.localStorageService.removeRememberLoginCredentials();
       }
     });
   }
@@ -53,7 +55,7 @@ export class SignInComponent implements OnInit {
       this.localStorageService.getRememberLoginCredentials();
     if (rememberLoginCredentials) {
       this.form.patchValue({
-        nit:rememberLoginCredentials.nit,
+        nit: rememberLoginCredentials.nit,
         password: rememberLoginCredentials.password,
         remember: true,
       });
@@ -75,7 +77,6 @@ export class SignInComponent implements OnInit {
   }
 
   onSubmit() {
-
     this.submitted = true;
     const { nit, password } = this.form.value;
 
@@ -91,15 +92,20 @@ export class SignInComponent implements OnInit {
         }
 
         */
-        sessionStorage.setItem('access_token', response.access_token);
+        this.sessionStorageService.saveAccessToken(response.access_token);
 
-        if ( this.form.controls['remember'].value ) {
+        if (this.form.controls['remember'].value) {
           this.localStorageService.setRememberLoginCredentials({
             nit,
             password,
           });
         }
-        this._router.navigate(['/']);
+        const lastUrlUsed = this.sessionStorageService.getLastUrl()
+        if (lastUrlUsed && lastUrlUsed !== this.router.url) {
+          this.router.navigateByUrl(lastUrlUsed);
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       (error) => {
         if (
@@ -118,8 +124,9 @@ export class SignInComponent implements OnInit {
                 nit,
                 password,
               };
-              sessionStorage.setItem('sign-data', JSON.stringify(signData));
-              this._router.navigate(['/auth/email-verification']);
+              this.sessionStorageService.saveSignData(signData);
+
+              this.router.navigate(['/auth/email-verification']);
             },
             (err) => {
               if (
@@ -146,6 +153,8 @@ export class SignInComponent implements OnInit {
     );
   }
   toggleRememberButton() {
-    this.form.controls['remember'].patchValue(!this.form.controls['remember'].value);
+    this.form.controls['remember'].patchValue(
+      !this.form.controls['remember'].value,
+    );
   }
 }

@@ -1,8 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { SessionStorageService } from '../../services/session-storage/session-storage.service';
 
 export const logOutGuard: CanActivateFn = (route, state) => {
-  sessionStorage.removeItem('access_token');
+  const sessionStorageService  = inject(SessionStorageService);
+  sessionStorageService.removeAccessToken()
   const router = inject(Router)
     router.navigate(['/home']);
   return false;

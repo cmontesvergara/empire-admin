@@ -7,8 +7,16 @@ const routes: Routes = [
 
   {
     path: '',
+   redirectTo: 'home', pathMatch: 'full'},
+  {
+    path: 'home',
     component: LoggedLayoutComponent,
     loadChildren: () => import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
+  },
+  {
+    path: 'profile',
+    component: LoggedLayoutComponent,
+    loadChildren: () => import('../profile/profile.module').then((m) => m.ProfileModule),
   },
   {
     path: 'components',
