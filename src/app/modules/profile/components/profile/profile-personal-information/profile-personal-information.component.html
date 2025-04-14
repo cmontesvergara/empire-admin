@@ -57,7 +57,7 @@
         </div>
         <div>
           <h3 class="font-medium text-gray-900 dark:text-white">Nombre</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400">{{user.name | titlecase}}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">{{user.first_name | titlecase}}</p>
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@
         </div>
         <div>
           <h3 class="font-medium text-gray-900 dark:text-white">Dirección</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400">{{user.addresses[0]}}</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">{{user.addresses[0].street.toUpperCase() }}, {{user.addresses[0].country}}</p>
         </div>
       </div>
     </div>

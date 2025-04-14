@@ -21,4 +21,19 @@ export class UserService {
       },
     });
   }
+  updateUserInformation(payload:any) {
+    return this.http.put(
+      `${this.baseUrl}/api/v1/user/update_information`,
+      {
+        user: {
+          basic_information: payload,
+        },
+      },
+      {
+        headers: {
+          'x-access-token': this.sessionStorageService.getAccessToken() || '',
+        },
+      },
+    );
+  }
 }
