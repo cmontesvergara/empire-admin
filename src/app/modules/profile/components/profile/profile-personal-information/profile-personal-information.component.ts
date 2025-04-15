@@ -1,18 +1,24 @@
 import { CommonModule, TitleCasePipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserBasicInformation } from '../../../models/user-basic-information';
 
 @Component({
   selector: 'app-profile-personal-information',
   templateUrl: './profile-personal-information.component.html',
   standalone: true,
-  imports:[TitleCasePipe,CommonModule],
+  imports: [TitleCasePipe, CommonModule],
   styleUrl: './profile-personal-information.component.scss',
 })
-export class ProfilePersonalInformationComponent implements OnInit {
+export class ProfilePersonalInformationComponent  {
   @Input() user: UserBasicInformation = <UserBasicInformation>{};
 
-  constructor() {}
+  constructor(
+    private readonly router: Router,
+  ) {}
 
-  ngOnInit(): void {}
+
+  callToAction() {
+    this.router.navigate(['/dashboard/profile/personal-information']);
+  }
 }

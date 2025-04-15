@@ -25,14 +25,14 @@ export class ErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse | any) => {
-        let errorMessage = 'Ocurrió un error inesperado';
+        let errorTitle = 'Ocurrió un error inesperado';
 
         if (error.error instanceof ErrorEvent) {
           // Error del lado del cliente
-          errorMessage = `Front Error: ${error.error.message}`;
+          errorTitle = `Front Error: ${error.error.message}`;
         } else {
           // Error del lado del servidor
-          errorMessage = `Back Error ${error.status}: ${error.message}`;
+          errorTitle = `Back Error ${error.status}: ${error.message}`;
           if (
             error.error.resultCode === 'UNAUTHORIZED' &&
             error.error.message.includes('jwt expired')
@@ -46,6 +46,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               this.sessionStorageService.removeAccessToken()
               this.router.navigateByUrl('auth/sign-in');
           }
+
           if (
             error.error.resultCode === 'DEFAULT_ERROR'
           ) {
@@ -61,8 +62,12 @@ export class ErrorInterceptor implements HttpInterceptor {
           }
         }
 
-        console.error(errorMessage);
-        return throwError(() => new Error(errorMessage));
+        //console.error(errorTitle);
+        return throwError(() => {
+          let e = new Error();
+          e = { ...e, ...error.error, errorTitle: errorTitle };
+          return e;
+        });
       }),
     );
   }

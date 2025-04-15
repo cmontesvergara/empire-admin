@@ -37,8 +37,8 @@ export class ProfileSecurityComponent implements OnInit {
     // Logic to get location information
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
-        console.log('Latitude:', position.coords.latitude);
-        console.log('Longitude:', position.coords.longitude);
+        // console.log('Latitude:', position.coords.latitude);
+        // console.log('Longitude:', position.coords.longitude);
         this.ubication = await this.getReverseGeocoding(
           position.coords.latitude.toString(),
           position.coords.longitude.toString(),
@@ -60,7 +60,7 @@ export class ProfileSecurityComponent implements OnInit {
         },
       }),
     );
-    console.log(data);
+   // console.log(data);
     return `${data[0].state}, ${data[0].country}`;
   }
   private async getIpAddress() {

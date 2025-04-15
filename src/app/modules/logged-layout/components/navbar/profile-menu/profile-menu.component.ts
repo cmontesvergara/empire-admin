@@ -1,8 +1,16 @@
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { NgClass } from '@angular/common';
+import {
+  animate,
+  state,
+  style,
+  transition,
+  trigger,
+} from '@angular/animations';
+import { NgClass, TitleCasePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { AvatarModule } from 'ngx-avatars';
+import { UserService } from 'src/app/core/services/user/user.service';
 import { ThemeService } from '../../../../../core/services/theme/theme.service';
 import { ClickOutsideDirective } from '../../../../../shared/directives/click-outside.directive';
 
@@ -11,7 +19,14 @@ import { ClickOutsideDirective } from '../../../../../shared/directives/click-ou
   templateUrl: './profile-menu.component.html',
   styleUrls: ['./profile-menu.component.scss'],
   standalone: true,
-  imports: [ClickOutsideDirective, NgClass, RouterLink, AngularSvgIconModule],
+  imports: [
+    ClickOutsideDirective,
+    NgClass,
+    RouterLink,
+    AngularSvgIconModule,
+    AvatarModule,
+    TitleCasePipe,
+  ],
   animations: [
     trigger('openClose', [
       state(
@@ -41,7 +56,7 @@ export class ProfileMenuComponent implements OnInit {
     {
       title: 'Your Profile',
       icon: './assets/icons/heroicons/outline/user-circle.svg',
-      link: '/profile',
+      link: '/dashboard/profile',
     },
     {
       title: 'Settings',
@@ -87,8 +102,22 @@ export class ProfileMenuComponent implements OnInit {
   ];
 
   public themeMode = ['light', 'dark'];
+  userInformation: any = undefined;
 
-  constructor(public themeService: ThemeService) {}
+  constructor(
+    public themeService: ThemeService,
+    private readonly userService: UserService,
+  ) {
+    this.userService.getUserInformation().subscribe((res: any) => {
+      this.userInformation = {
+        name:
+          res.basic_information.first_name +
+          ' ' +
+          res.basic_information.last_name,
+        email: res.basic_information.email,
+      };
+    });
+  }
 
   ngOnInit(): void {}
 

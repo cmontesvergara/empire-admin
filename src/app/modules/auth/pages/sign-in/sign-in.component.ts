@@ -1,8 +1,15 @@
 import { NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { toast } from 'ngx-sonner';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { LocalStorageService } from 'src/app/core/services/local-storage/local-storage.service';
 import { SessionStorageService } from 'src/app/core/services/session-storage/session-storage.service';
@@ -100,7 +107,7 @@ export class SignInComponent implements OnInit {
             password,
           });
         }
-        const lastUrlUsed = this.sessionStorageService.getLastUrl()
+        const lastUrlUsed = this.sessionStorageService.getLastUrl();
         if (lastUrlUsed && lastUrlUsed !== this.router.url) {
           this.router.navigateByUrl(lastUrlUsed);
         } else {
@@ -108,16 +115,15 @@ export class SignInComponent implements OnInit {
         }
       },
       (error) => {
-        if (
-          error?.error?.code === 401 &&
-          error?.error?.resultCode === 'UNAUTHORIZED'
-        ) {
+        if (error?.code === 401 && error?.resultCode === 'UNAUTHORIZED') {
           this.form.controls['password'].setErrors({ invalid: true });
+
+          toast.error('Valida tus credenciales.', {
+            position: 'bottom-right',
+            description: 'Parece que tus credenciales no coinciden.',
+          });
         }
-        if (
-          error?.error?.code === 403 &&
-          error?.error?.resultCode === 'FORBIDDEN'
-        ) {
+        if (error?.code === 403 && error?.resultCode === 'FORBIDDEN') {
           this.authService.sendEmailOtpCode(nit).subscribe(
             (res) => {
               const signData = {
@@ -142,10 +148,7 @@ export class SignInComponent implements OnInit {
             },
           );
         }
-        if (
-          error?.error?.code === 404 &&
-          error?.error?.resultCode === 'RESOURCE_NOT_FOUND'
-        ) {
+        if (error?.code === 404 && error?.resultCode === 'RESOURCE_NOT_FOUND') {
           this.form.controls['nit'].setErrors({ invalid: true });
           this.form.controls['password'].setErrors({ invalid: true });
         }
