@@ -6,6 +6,7 @@
       <div class="flex rounded text-muted-foreground hover:bg-card hover:text-foreground" (click)="toggleMenu(sub)">
         <!-- Condition -->
         <ng-container
+        *ngIf="sub.hidden !== true"
           [ngTemplateOutlet]="sub.children ? childMenu : parentMenu"
           [ngTemplateOutletContext]="{ sub: sub }">
         </ng-container>
@@ -13,6 +14,7 @@
         <!-- Parent Menu -->
         <ng-template #parentMenu let-sub="sub">
           <a
+          *ngIf="sub.hidden !== true"
             [routerLink]="sub.route"
             routerLinkActive="text-primary"
             [routerLinkActiveOptions]="{ exact: true }"
@@ -23,10 +25,11 @@
 
         <!-- Child Menu -->
         <ng-template #childMenu let-sub="sub">
-          <a class="inline-block w-full cursor-pointer px-4 py-2 text-xs font-semibold">
+          <a *ngIf="sub.hidden !== true" class="inline-block w-full cursor-pointer px-4 py-2 text-xs font-semibold">
             {{ sub.label }}
           </a>
           <button
+          *ngIf="sub.hidden !== true"
             [ngClass]="{ hidden: !menuService.showSideBar, 'rotate-90': sub.expanded }"
             class="flex items-center p-1 text-muted-foreground transition-all duration-500">
             <svg-icon src="assets/icons/heroicons/solid/chevron-right.svg" [svgClass]="'h-5 w-5'"> </svg-icon>
@@ -34,7 +37,7 @@
         </ng-template>
       </div>
       <!-- Submenu items -->
-      <app-sidebar-submenu [submenu]="sub"></app-sidebar-submenu>
+      <app-sidebar-submenu *ngIf="sub.hidden !== true" [submenu]="sub"></app-sidebar-submenu>
     </li>
   </ul>
 </div>

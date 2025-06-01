@@ -5,14 +5,16 @@ export class Menu {
     {
       group: 'Base',
       separator: false,
+      hidden: false,
       items: [
         {
+          hidden: false,
           icon: 'assets/icons/heroicons/outline/chart-pie.svg',
           label: 'Dashboard',
           route: '/dashboard',
           children: [
             { label: 'Nfts', route: '/dashboard/nfts' },
-             { label: 'Podcast', route: '/dashboard/podcast' },
+            { label: 'Podcast', route: '/dashboard/podcast', hidden: true },
           ],
         },
         {
@@ -23,10 +25,9 @@ export class Menu {
             { label: 'Search App', route: '/apps/gallery' },
             { label: 'Css Unit Changer', route: '/apps/css-unit-changer' },
             { label: 'File Renamer', route: '/apps/file-renamer' },
-
           ],
         },
-        {
+        { hidden:true,
           icon: 'assets/icons/heroicons/outline/lock-closed.svg',
           label: 'Auth',
           route: '/auth',
@@ -38,7 +39,7 @@ export class Menu {
             { label: 'Two Steps', route: '/auth/two-steps' },
           ],
         },
-        {
+        { hidden:true,
           icon: 'assets/icons/heroicons/outline/exclamation-triangle.svg',
           label: 'Errors',
           route: '/errors',
@@ -47,7 +48,7 @@ export class Menu {
             { label: '500', route: '/errors/500' },
           ],
         },
-        {
+        { hidden:true,
           icon: 'assets/icons/heroicons/outline/cube.svg',
           label: 'Components',
           route: '/components',
@@ -58,32 +59,37 @@ export class Menu {
     {
       group: 'Collaboration',
       separator: true,
+      hidden: false,
       items: [
         {
-          icon: 'assets/icons/heroicons/outline/globe-alt.svg',
           label: 'Descubre Apps',
+          icon: 'assets/icons/heroicons/outline/globe-alt.svg',
           route: '/dashboard/util/app-gallery',
         },
         {
           icon: 'assets/icons/heroicons/outline/download.svg',
           label: 'Download',
           route: '/download',
+          hidden: true,
         },
         {
           icon: 'assets/icons/heroicons/outline/gift.svg',
           label: 'Gift Card',
           route: '/gift',
+          hidden: true,
         },
         {
           icon: 'assets/icons/heroicons/outline/users.svg',
           label: 'Users',
           route: '/users',
+          hidden: true,
         },
       ],
     },
     {
       group: 'Config',
       separator: false,
+      hidden: true,
       items: [
         {
           icon: 'assets/icons/heroicons/outline/cog.svg',
