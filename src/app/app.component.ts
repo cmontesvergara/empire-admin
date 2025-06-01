@@ -13,7 +13,7 @@ import { ResponsiveHelperComponent } from './shared/components/responsive-helper
   imports: [NgClass, RouterOutlet, ResponsiveHelperComponent, NgxSonnerToaster,CommonModule],
 })
 export class AppComponent {
-  title = 'Empire Admin';
+  title = 'Administrador';
 
   constructor(
     public themeService: ThemeService,
