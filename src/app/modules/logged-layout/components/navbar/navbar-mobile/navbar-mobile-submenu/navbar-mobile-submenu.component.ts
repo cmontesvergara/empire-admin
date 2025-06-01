@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgTemplateOutlet } from '@angular/common';
+import { CommonModule, NgClass, NgFor, NgTemplateOutlet } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -16,7 +16,8 @@ import { MenuService } from 'src/app/modules/logged-layout/services/menu.service
         NgTemplateOutlet,
         RouterLinkActive,
         RouterLink,
-        AngularSvgIconModule,
+      AngularSvgIconModule,
+        CommonModule
     ],
 })
 export class NavbarMobileSubmenuComponent implements OnInit {
