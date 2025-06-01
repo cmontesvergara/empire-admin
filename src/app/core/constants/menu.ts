@@ -17,9 +17,10 @@ export class Menu {
         },
         {
           icon: 'assets/icons/heroicons/outline/lock-closed.svg',
-          label: 'Apps',
+          label: 'Mis Apps',
           route: '/apps',
           children: [
+            { label: 'Search App', route: '/apps/gallery' },
             { label: 'Css Unit Changer', route: '/apps/css-unit-changer' },
             { label: 'File Renamer', route: '/apps/file-renamer' },
 
@@ -58,6 +59,11 @@ export class Menu {
       group: 'Collaboration',
       separator: true,
       items: [
+        {
+          icon: 'assets/icons/heroicons/outline/globe-alt.svg',
+          label: 'Descubre Apps',
+          route: '/dashboard/util/app-gallery',
+        },
         {
           icon: 'assets/icons/heroicons/outline/download.svg',
           label: 'Download',

@@ -151,7 +151,7 @@ export class PersonalInformationComponent implements OnInit {
         .updateUserInformation(this.user)
         .subscribe((response) => {
           console.log('Datos actualizados:', response);
-          this.userForm.reset(this.user);
+          location.reload()
         });
     }
   }
