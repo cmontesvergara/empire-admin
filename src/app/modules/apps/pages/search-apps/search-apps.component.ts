@@ -30,34 +30,6 @@ export class SearchAppsComponent {
       description: 'Herramienta profesional de diseño vectorial',
       link: '/apps/file-renamer',
     },
-    {
-      name: 'Design Pro',
-      category: 'Productividad',
-      icon: '🎨',
-      description: 'Herramienta profesional de diseño vectorial',
-      link: '/apps/css-unit-changer',
-    },
-    {
-      name: 'CodeMaster',
-      category: 'Desarrollo',
-      icon: '💻',
-      description: 'Entorno de desarrollo integrado moderno',
-      link: '/apps/css-unit-changer',
-    },
-    {
-      name: 'Finance+',
-      category: 'Negocios',
-      icon: '📊',
-      description: 'Gestión financiera y análisis avanzado',
-      link: '/apps/css-unit-changer',
-    },
-    {
-      name: 'PhotoStudio',
-      category: 'Creatividad',
-      icon: '📷',
-      description: 'Edición fotográfica profesional',
-      link: '/apps/css-unit-changer',
-    },
   ];
   constructor(private readonly router: Router, private route: ActivatedRoute) {
     this.route.data.subscribe((data) => {
