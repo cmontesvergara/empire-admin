@@ -5,7 +5,7 @@ export class Menu {
     {
       group: 'Base',
       separator: false,
-      hidden: false,
+      hidden: true,
       items: [
         {
           hidden: false,
