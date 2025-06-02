@@ -133,7 +133,7 @@ export class SignUpComponent implements OnInit {
       const payload = {
         user: {
           basic_information: {
-            name: this.signUpForm.value.name.trim().toUpperCase(),
+            first_name: this.signUpForm.value.name.trim().toUpperCase(),
             last_name: this.signUpForm.value.last_name.trim().toUpperCase(),
             second_last_name: this.signUpForm.value?.second_last_name
               ?.trim()
