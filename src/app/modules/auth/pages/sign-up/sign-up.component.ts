@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
+import { toast } from 'ngx-sonner';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { SessionStorageService } from 'src/app/core/services/session-storage/session-storage.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
@@ -157,6 +158,10 @@ export class SignUpComponent implements OnInit {
           this.router.navigate(['/auth/email-verification']);
         },
         (err) => {
+          toast.error('Ocurrio un error.', {
+            position: 'bottom-right',
+            description: err.message || 'Vuelva a intentarlo.',
+          });
           console.log(err);
         },
       );
