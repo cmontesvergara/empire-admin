@@ -5,7 +5,7 @@ import { LoggedLayoutComponent } from './logged-layout.component';
 const routes: Routes = [
 
   {
-    path: '',
+    path: 'dashboard-path',
     component: LoggedLayoutComponent,
     loadChildren: () =>
       import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
@@ -29,7 +29,7 @@ const routes: Routes = [
       import('../uikit/uikit.module').then((m) => m.UikitModule),
   },
 
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'profile', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];
 
