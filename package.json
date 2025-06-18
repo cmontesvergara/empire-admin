@@ -1,9 +1,9 @@
 {
-  "name": "empire-admin",
+  "name": "bigso-admin",
   "displayName": "Administrador",
   "version": "0.9.1",
   "description": "Admin Dashboard",
-  "author": "Empire Team",
+  "author": "Bigso Team",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
