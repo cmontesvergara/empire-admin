@@ -22,6 +22,7 @@
       {
         "list": "off"
       }
-    ]
+    ],
+    "axe/keyboard": "off"
   }
 }

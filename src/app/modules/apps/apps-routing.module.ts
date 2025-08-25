@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppsComponent } from './apps.component';
 import { CssUnitChangerComponent } from './pages/css-unit-changer/css-unit-changer.component';
+import { DavidSenderComponent } from './pages/david-sender/david-sender.component';
 import { FileRenamerComponent } from './pages/file-renamer/file-renamer.component';
 import { SearchAppsComponent } from './pages/search-apps/search-apps.component';
 
@@ -14,6 +15,11 @@ const routes: Routes = [
       {
         path: 'css-unit-changer',
         component: CssUnitChangerComponent,
+        data: { returnUrl: window.location.pathname },
+      },
+      {
+        path: 'david-sender',
+        component: DavidSenderComponent,
         data: { returnUrl: window.location.pathname },
       },
       { path: 'file-renamer', component: FileRenamerComponent },
