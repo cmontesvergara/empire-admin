@@ -5,8 +5,8 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'http://localhost:4000',
-  //baseUrl: 'https://back-sso.bigso.co',
+  //baseUrl: 'http://localhost:4000',
+  baseUrl: 'http://sso.msoft.uno',
 };
 
 /*

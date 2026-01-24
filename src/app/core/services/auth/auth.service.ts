@@ -11,7 +11,7 @@ export class AuthService {
   constructor(private readonly http: HttpClient) {}
 
   signIn(nit: string, password: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/login`, {
+    return this.http.post(`${this.baseUrl}/api/v1/signin`, {
       credentials: {
         nit,
         password,
@@ -19,7 +19,7 @@ export class AuthService {
     });
   }
   signUp(values: any) {
-    return this.http.post(`${this.baseUrl}/api/v1/user/create`, values);
+    return this.http.post(`${this.baseUrl}/api/v1/auth/signup`, values);
   }
 
   sendEmailOtpCode(nit: string) {

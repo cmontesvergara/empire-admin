@@ -1,25 +1,67 @@
-<form class="my-10 space-y-6" (ngSubmit)="onSubmit()">
-  <div class="text-center">
-    <h2 class="mb-1 text-3xl font-semibold text-foreground">Verifica tu cuenta</h2>
-    <p class="text-sm text-muted-foreground">Ingresa el código OTP enviado al correo que pusiste cuando te registraste con el NIT</p>
-    <div class="mt-2 text-lg text-muted-foreground">{{nit}}</div>
+<form class="my-10 space-y-6" (ngSubmit)="requestVerificationCode()">
+  <div class="text-center mb-8">
+    <h2 class="mb-1 text-3xl font-semibold text-foreground">Verificación de Email</h2>
+    <p class="text-sm text-muted-foreground">
+      Ingresa tu correo electrónico para recibir el link de verificación
+    </p>
+
   </div>
 
-  <div class="grid grid-cols-6">
-    @for (item of inputs; track $index) {
+  <!-- Campo de email -->
+  <div class="space-y-2">
+    <label for="email" class="block text-sm font-medium text-foreground">
+      Correo Electrónico
+    </label>
     <input
-    [id]="'input-'+ $index"
-      (input)="onInputChange($event, $index)"
-      placeholder=""
-      maxlength="1"
-      class="h-10 w-10 rounded-md border border-border bg-background text-center text-muted-foreground outline-none focus:border-primary sm:h-14 sm:w-14" />
-    }
+      type="email"
+      id="email"
+      name="email"
+      [(ngModel)]="email"
+      placeholder="ejemplo@correo.com"
+      required
+      class="w-full h-10 px-3 rounded-md border border-border bg-background text-foreground outline-none focus:border-primary"
+    />
   </div>
 
-  <!-- Submit Button -->
+  <!-- Mensajes de error y éxito -->
+  @if (errorMessage) {
+    <div class="p-3 rounded-md bg-red-50 text-red-600 text-sm">
+      {{ errorMessage }}
+    </div>
+  }
+  @if (successMessage) {
+    <div class="p-3 rounded-md bg-green-50 text-green-600 text-sm">
+      {{ successMessage }}
+    </div>
+  }
+
+  <!-- Botón enviar -->
   <div>
-    <app-button full impact="bold" tone="primary" shape="rounded" size="medium">
-      Verificar
+    <app-button
+      full
+      impact="bold"
+      tone="primary"
+      shape="rounded"
+      size="medium"
+      [disabled]="isLoading"
+    >
+      {{ isLoading ? 'Enviando...' : 'Enviar link de verificación' }}
     </app-button>
   </div>
+
+  <!-- Link para iniciar sesión -->
+  <div class="text-center">
+    <a
+      routerLink="/auth/sign-in"
+      class="text-sm text-primary hover:underline"
+    >
+      Volver a iniciar sesión
+    </a>
+  </div>
 </form>
+
+
+
+<p class="mt-3 text-xs text-yellow-600 dark:text-yellow-500">
+  Tu cuenta permanecerá desactivada mientras no se verifique el correo electrónico
+</p>

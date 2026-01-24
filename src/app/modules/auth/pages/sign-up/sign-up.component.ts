@@ -131,31 +131,22 @@ export class SignUpComponent implements OnInit {
         this.signUpForm.value.last_name = last_name;
         this.signUpForm.value.second_last_name = second_last_name;
       }
+
       const payload = {
-        user: {
-          basic_information: {
-            first_name: this.signUpForm.value.name.trim().toUpperCase(),
-            last_name: this.signUpForm.value.last_name.trim().toUpperCase(),
-            second_last_name: this.signUpForm.value?.second_last_name
+            firstName: this.signUpForm.value.name.trim().toUpperCase(),
+            lastName: this.signUpForm.value.last_name.trim().toUpperCase(),
+            secondLastName: this.signUpForm.value?.second_last_name
               ?.trim()
               ?.toUpperCase(),
             phone: this.signUpForm.value.phone.trim(),
             email: this.signUpForm.value.email.trim().toLowerCase(),
-            nit: this.signUpForm.value.nit.trim(),
-          },
-          secure_information: {
+            nuid: this.signUpForm.value.nit.trim(),
             password: this.signUpForm.value.confirmPassword.trim(),
-          },
-        },
       };
+
       this.authService.signUp(payload).subscribe(
         (res) => {
-          const signData = {
-            nit: payload.user.basic_information.nit,
-            password: payload.user.secure_information.password,
-          };
-          this.sessionStorageService.saveSignData(signData);
-          this.router.navigate(['/auth/email-verification']);
+          this.router.navigate(['/auth/success-sign-up']);
         },
         (err) => {
           toast.error('Ocurrio un error.', {
