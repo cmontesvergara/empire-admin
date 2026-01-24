@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { emailTokenValidationGuard } from 'src/app/core/guards/email-token-validation/email-token-validation.guard';
 import { emailVerificationGuard } from 'src/app/core/guards/email-verification/email-verification.guard';
 import { logOutGuard } from 'src/app/core/guards/log-out/log-out.guard';
+import { twoFactorTokenGuard } from 'src/app/core/guards/two-factor-token/two-factor-token.guard';
 import { AuthComponent } from './auth.component';
 import { EmailVerificationValidateComponent } from './pages/email-verification-validate/email-verification-validate.component';
 import { EmailVerificationComponent } from './pages/email-verification/email-verification.component';
@@ -31,7 +32,11 @@ const routes: Routes = [
       { path: 'sign-up', component: SignUpComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'new-password', component: NewPasswordComponent },
-      { path: 'two-steps', component: TwoStepsComponent },
+      {
+        path: 'two-steps',
+        component: TwoStepsComponent,
+        canActivate: [twoFactorTokenGuard],
+      },
       {
         path: 'email-verification',
         component: EmailVerificationComponent,

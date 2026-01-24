@@ -91,16 +91,19 @@ export class SignInComponent implements OnInit {
 
     this.authService.signIn(nit, password).subscribe(
       (response: any) => {
-        /*
-        response:
-          {
-          access_token: string;
-          expired: number;
-          message: string;
-          resultCode: number;
+        // Check if 2FA is required
+        if (response.requiresTwoFactor) {
+          // Redirect to 2FA validation page with tempToken
+          this.router.navigate(['/auth/two-steps'], {
+            queryParams: {
+              token: response.tempToken,
+              validate: 'true'
+            }
+          });
+          return;
         }
 
-        */
+        // Normal login flow (no 2FA)
         this.sessionStorageService.saveAccessToken(response.tokens.accessToken);
         this.sessionStorageService.saveRefreshToken(
           response.tokens.refreshToken,

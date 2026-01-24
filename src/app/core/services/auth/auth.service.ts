@@ -56,4 +56,29 @@ export class AuthService {
       token,
     });
   }
+
+  generateOTP(userId: string, name: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/otp/generate`, {
+      userId,
+      name,
+    });
+  }
+
+  verifyOTP(userId: string, token: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/otp/verify`, {
+      userId,
+      token,
+    });
+  }
+
+  validateOTP(tempToken: string, token: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/otp/validate`, {
+      tempToken,
+      token,
+    });
+  }
+
+  checkOTPStatus(userId: string) {
+    return this.http.get(`${this.baseUrl}/api/v1/otp/status/${userId}`);
+  }
 }
