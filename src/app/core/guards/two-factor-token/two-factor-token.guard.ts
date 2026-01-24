@@ -7,7 +7,7 @@ export const twoFactorTokenGuard: CanActivateFn = (route, state) => {
   const isValidating = route.queryParams['validate'] === 'true';
   const token = route.queryParams['token'];
   const userId = route.queryParams['userId'];
-  const email = route.queryParams['email'];
+  const name = route.queryParams['name'];
 
   // Si está en modo validación, debe tener el token
   if (isValidating && !token) {
@@ -15,8 +15,8 @@ export const twoFactorTokenGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  // Si está en modo setup, debe tener userId y email
-  if (!isValidating && (!userId || !email)) {
+  // Si está en modo setup, debe tener userId y name
+  if (!isValidating && (!userId || !name)) {
     router.navigate(['/auth/sign-in']);
     return false;
   }
