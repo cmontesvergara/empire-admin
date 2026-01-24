@@ -101,7 +101,10 @@ export class SignInComponent implements OnInit {
         }
 
         */
-        this.sessionStorageService.saveAccessToken(response.access_token);
+        this.sessionStorageService.saveAccessToken(response.tokens.accessToken);
+        this.sessionStorageService.saveRefreshToken(
+          response.tokens.refreshToken,
+        );
 
         if (this.form.controls['remember'].value) {
           this.localStorageService.setRememberLoginCredentials({

@@ -6,8 +6,9 @@ import { Injectable } from '@angular/core';
 export class SessionStorageService {
   keys = {
     lastUrl: 'LAST_URL_KEY',
-    accessToken: 'x-aceess-token',
-    signData: 'x-aceess-token',
+    accessToken: 'x-access-token',
+    refreshToken: 'x-refresh-token',
+    signData: 'x-sign-data',
   };
 
   constructor() {}
@@ -24,11 +25,20 @@ export class SessionStorageService {
   saveAccessToken(payload: string) {
     sessionStorage.setItem(this.keys.accessToken, payload);
   }
+  saveRefreshToken(payload: string) {
+    sessionStorage.setItem(this.keys.refreshToken, payload);
+  }
   getAccessToken() {
     return  sessionStorage.getItem(this.keys.accessToken) ;
   }
+  getRefreshToken() {
+    return  sessionStorage.getItem(this.keys.refreshToken) ;
+  }
   removeAccessToken() {
     sessionStorage.removeItem(this.keys.accessToken);
+  }
+  removeRefreshToken() {
+    sessionStorage.removeItem(this.keys.refreshToken);
   }
   saveSignData(payload: any) {
     sessionStorage.setItem(this.keys.signData, JSON.stringify(payload));
