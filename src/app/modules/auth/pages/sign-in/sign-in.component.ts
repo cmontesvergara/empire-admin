@@ -11,6 +11,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { toast } from 'ngx-sonner';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { LoadingService } from 'src/app/core/services/loading/loading.service';
 import { LocalStorageService } from 'src/app/core/services/local-storage/local-storage.service';
 import { SessionStorageService } from 'src/app/core/services/session-storage/session-storage.service';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
@@ -42,6 +43,7 @@ export class SignInComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly localStorageService: LocalStorageService,
     private readonly sessionStorageService: SessionStorageService,
+    public loadingService: LoadingService,
   ) {
     this.form = this._formBuilder.group({
       nit: ['', [Validators.required, Validators.maxLength(10)]],
@@ -123,35 +125,20 @@ export class SignInComponent implements OnInit {
             description: 'Parece que tus credenciales no coinciden.',
           });
         }
-        if (error?.code === 403 && error?.resultCode === 'FORBIDDEN') {
-          this.authService.sendEmailOtpCode(nit).subscribe(
-            (res) => {
-              const signData = {
-                nit,
-                password,
-              };
-              this.sessionStorageService.saveSignData(signData);
+        console.log('Error signIn:', error);
+        if (error?.error === 'ACCOUNT_NOT_ACTIVE') {
+          // Extract encoded userId from error details if available
+          const encodedUserId = error?.errors?.[0]?.userId;
 
-              this.router.navigate(['/auth/email-verification']);
-            },
-            (err) => {
-              if (
-                error?.error?.code === 403 &&
-                error?.error?.resultCode === 'FORBIDDEN'
-              ) {
-                alert('Usuario bloquedo temporalmente, intenta mas tarde');
-              } else {
-                alert(
-                  'Error al enviar el codigo de verificacion, intenta mas tarde',
-                );
-              }
-            },
-          );
+          if (encodedUserId) {
+            this.loadingService.loading = true;
+            // Redirect to email verification with userId as query param
+            this.router.navigate(['/auth/email-verification'], {
+              queryParams: { userId: encodedUserId },
+            });
+          }
         }
-        if (error?.code === 404 && error?.resultCode === 'RESOURCE_NOT_FOUND') {
-          this.form.controls['nit'].setErrors({ invalid: true });
-          this.form.controls['password'].setErrors({ invalid: true });
-        }
+
       },
     );
   }

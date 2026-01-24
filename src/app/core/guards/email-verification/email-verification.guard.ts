@@ -1,11 +1,9 @@
-import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { SessionStorageService } from '../../services/session-storage/session-storage.service';
 
 export const emailVerificationGuard: CanActivateFn = (route, state) => {
-  const sessionStorageService = inject(SessionStorageService);
-  const { nit, password } = sessionStorageService.getSignData() ;
-  if (nit && password) {
+  // Check if userId is present in query params
+  const userId = route.queryParams['userId'];
+  if (userId) {
     return true;
   }
   return false;

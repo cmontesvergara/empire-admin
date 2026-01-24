@@ -5,8 +5,8 @@
 
 export const environment = {
   production: false,
-  //baseUrl: 'http://localhost:4000',
-  baseUrl: 'http://sso.msoft.uno',
+  baseUrl: 'http://localhost:3000',
+  //baseUrl: 'http://sso.msoft.uno',
 };
 
 /*

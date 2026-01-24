@@ -11,22 +11,19 @@ export class AuthService {
   constructor(private readonly http: HttpClient) {}
 
   signIn(nit: string, password: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/signin`, {
-      credentials: {
-        nit,
-        password,
-      },
+    return this.http.post(`${this.baseUrl}/api/v1/auth/signin`, {
+      nuid: nit,
+      password,
     });
   }
   signUp(values: any) {
     return this.http.post(`${this.baseUrl}/api/v1/auth/signup`, values);
   }
 
-  sendEmailOtpCode(nit: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/verify/send_email_code`, {
-      credentials: {
-        nit,
-      },
+  sendEmailOtpCode(email: string, userId: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/email-verification/send`, {
+      email,
+      userId: userId
     });
   }
   validateEmailRecovery(newPassword: string, otp: string) {
@@ -51,6 +48,12 @@ export class AuthService {
         nit,
       },
       code,
+    });
+  }
+
+  verifyEmailToken(token: string) {
+    return this.http.post(`${this.baseUrl}/api/v1/email-verification/verify`, {
+      token,
     });
   }
 }

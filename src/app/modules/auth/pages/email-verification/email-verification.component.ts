@@ -1,8 +1,9 @@
 import { CommonModule, } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { LoadingService } from 'src/app/core/services/loading/loading.service';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 
 @Component({
@@ -13,15 +14,31 @@ import { ButtonComponent } from 'src/app/shared/components/button/button.compone
   imports: [FormsModule, ButtonComponent, CommonModule, RouterModule],
   providers: [AuthService],
 })
-export class EmailVerificationComponent {
+export class EmailVerificationComponent implements OnInit {
   email: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  encodedUserId: string | null = null;
 
   constructor(
     private readonly authService: AuthService,
-  ) {}
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    public loadingService: LoadingService,
+  ) {
+    setTimeout(() => {
+      this.loadingService.loading = false;
+
+    }, 1000);
+  }
+
+  ngOnInit(): void {
+    // Get userId from query params
+    this.route.queryParams.subscribe(params => {
+      this.encodedUserId = params['userId'] || null;
+    });
+  }
 
   requestVerificationCode() {
     if (!this.email || !this.email.trim()) {
@@ -33,17 +50,43 @@ export class EmailVerificationComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.authService.sendEmailOtpCode(this.email).subscribe(
-      (response: any) => {
+    // Use the encodedUserId from URL if available
+    let userId = null;
+
+    try {
+      userId = this.encodedUserId ? atob(this.encodedUserId) : null;
+    } catch (error) {
+      console.error('Error decoding userId:', error);
+    }if(!userId) {
+      this.isLoading = false;
+      this.errorMessage = 'Error al enviar el código de verificación. Por favor verifica tu correo.';
+      return;
+    }
+    this.authService.sendEmailOtpCode(this.email, userId).subscribe({
+      next: (response: any) => {
         this.isLoading = false;
-        this.successMessage = 'Si hay una cuenta vinculada a este correo, se enviará un link de verificación.';
+        this.successMessage = 'Si hay una cuenta vinculada a este correo, se enviará un link de verificación. Redirigiendo al login...';
         this.email = '';
+
+        // Redirigir al signin después de 5 segundos
+        setTimeout(() => {
+          this.router.navigate(['/auth/sign-in']);
+        }, 5000);
       },
-      (error: any) => {
+      error: (error: any) => {
         this.isLoading = false;
-        this.successMessage = 'Si hay una cuenta vinculada a este correo, se enviará un link de verificación.';
+        if (error.status === 400) {
+          this.errorMessage = 'Error al enviar el código de verificación. Redirigiendo al login...';
+        } else {
+          this.successMessage = 'Si hay una cuenta vinculada a este correo, se enviará un link de verificación. Redirigiendo al login...';
+        }
         this.email = '';
+
+        // Redirigir al signin después de 5 segundos INDEPENDIENTEMENTE del error
+        setTimeout(() => {
+          this.router.navigate(['/auth/sign-in']);
+        }, 5000);
       }
-    );
+    });
   }
 }

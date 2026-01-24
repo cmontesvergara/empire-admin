@@ -1,8 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { emailTokenValidationGuard } from 'src/app/core/guards/email-token-validation/email-token-validation.guard';
 import { emailVerificationGuard } from 'src/app/core/guards/email-verification/email-verification.guard';
 import { logOutGuard } from 'src/app/core/guards/log-out/log-out.guard';
 import { AuthComponent } from './auth.component';
+import { EmailVerificationValidateComponent } from './pages/email-verification-validate/email-verification-validate.component';
 import { EmailVerificationComponent } from './pages/email-verification/email-verification.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { NewPasswordComponent } from './pages/new-password/new-password.component';
@@ -34,6 +36,11 @@ const routes: Routes = [
         path: 'email-verification',
         component: EmailVerificationComponent,
         canActivate: [emailVerificationGuard],
+      },
+      {
+        path: 'verify-email',
+        component: EmailVerificationValidateComponent,
+        canActivate: [emailTokenValidationGuard],
       },
       { path: '**', redirectTo: 'sign-in', pathMatch: 'full' },
     ],
