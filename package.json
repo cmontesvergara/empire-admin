@@ -1,8 +1,8 @@
 {
-  "name": "bigso-admin",
-  "displayName": "Administrador",
+  "name": "sso-portal",
+  "displayName": "SSO Portal",
   "version": "0.9.1",
-  "description": "Admin Dashboard",
+  "description": "Single Sign-On Portal",
   "author": "Bigso Team",
   "license": "MIT",
   "scripts": {

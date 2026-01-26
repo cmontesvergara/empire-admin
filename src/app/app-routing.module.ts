@@ -12,7 +12,7 @@ const routes: Routes = [
     path: 'dashboard',
     canActivate: [isLoggedGuard],
     loadChildren: () =>
-      import('./modules/logged-layout/logged-layout.module').then((m) => m.LoggedLayoutModule),
+      import('./modules/sso-dashboard/sso-dashboard.module').then((m) => m.SsoDashboardModule),
   },
   {
     path: 'home',
@@ -27,9 +27,10 @@ const routes: Routes = [
       import('./modules/auth/auth.module').then((m) => m.AuthModule),
   },
   {
-    path: 'apps',
+    path: 'profile',
+    canActivate: [isLoggedGuard],
     loadChildren: () =>
-      import('./modules/apps/apps.module').then((m) => m.AppsModule),
+      import('./modules/profile/profile.module').then((m) => m.ProfileModule),
   },
   {
     path: 'errors',

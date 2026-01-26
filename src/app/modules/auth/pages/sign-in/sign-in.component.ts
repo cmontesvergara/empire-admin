@@ -36,6 +36,14 @@ export class SignInComponent implements OnInit {
   form!: FormGroup;
   submitted = false;
   passwordTextType!: boolean;
+
+  // SSO Dual Mode
+  loginMode: 'direct' | 'app-initiated' = 'direct';
+  redirectUri: string = '';
+  appId: string = '';
+  tenantId: string = '';
+  appName: string = '';
+
   constructor(
     private readonly _formBuilder: FormBuilder,
     private readonly router: Router,
@@ -46,7 +54,7 @@ export class SignInComponent implements OnInit {
     public loadingService: LoadingService,
   ) {
     this.form = this._formBuilder.group({
-      nit: ['', [Validators.required, Validators.maxLength(10)]],
+      nit: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       remember: [''],
     });
@@ -60,6 +68,26 @@ export class SignInComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Detect SSO mode from query params
+    this.route.queryParams.subscribe((params) => {
+      this.redirectUri = params['redirect_uri'] || '';
+      this.appId = params['app_id'] || '';
+      this.tenantId = params['tenant_id'] || '';
+
+      // Determine login mode
+      if (this.redirectUri && this.appId) {
+        this.loginMode = 'app-initiated';
+        this.appName = this.getAppName(this.appId);
+      }
+
+      // Auto-fill nit if provided
+      const nit = params['nit'];
+      if (nit) {
+        this.form.patchValue({ nit });
+      }
+    });
+
+    // Remember me functionality
     const rememberLoginCredentials =
       this.localStorageService.getRememberLoginCredentials();
     if (rememberLoginCredentials) {
@@ -69,12 +97,16 @@ export class SignInComponent implements OnInit {
         remember: true,
       });
     }
-    this.route.queryParams.subscribe((params) => {
-      const nit = params['nit'];
-      if (nit) {
-        this.form.patchValue({ nit });
-      }
-    });
+  }
+
+  getAppName(appId: string): string {
+    const appNames: Record<string, string> = {
+      'admin': 'Panel Admin',
+      'crm': 'CRM',
+      'hr': 'Recursos Humanos',
+      'analytics': 'Analytics'
+    };
+    return appNames[appId] || appId;
   }
 
   get f() {
@@ -97,30 +129,29 @@ export class SignInComponent implements OnInit {
           this.router.navigate(['/auth/two-steps'], {
             queryParams: {
               token: response.tempToken,
-              validate: 'true'
+              validate: 'true',
+              // Preserve SSO params for after 2FA
+              ...(this.redirectUri && { redirect_uri: this.redirectUri }),
+              ...(this.appId && { app_id: this.appId }),
+              ...(this.tenantId && { tenant_id: this.tenantId })
             }
           });
           return;
         }
 
-        // Normal login flow (no 2FA)
-        this.sessionStorageService.saveAccessToken(response.tokens.accessToken);
-        this.sessionStorageService.saveRefreshToken(
-          response.tokens.refreshToken,
-        );
+        // SSO cookie already set by backend
+        // No need to save tokens in sessionStorage anymore
 
+        // Remember me functionality (optional)
         if (this.form.controls['remember'].value) {
           this.localStorageService.setRememberLoginCredentials({
             nit,
             password,
           });
         }
-        const lastUrlUsed = this.sessionStorageService.getLastUrl();
-        if (lastUrlUsed && lastUrlUsed !== this.router.url) {
-          this.router.navigateByUrl(lastUrlUsed);
-        } else {
-          this.router.navigate(['/']);
-        }
+
+        // Post-login redirect based on mode
+        this.handlePostLoginRedirect();
       },
       (error) => {
         if (error?.code === 401 && error?.resultCode === 'UNAUTHORIZED') {
@@ -147,6 +178,37 @@ export class SignInComponent implements OnInit {
 
       },
     );
+  }
+
+  handlePostLoginRedirect() {
+    if (this.loginMode === 'app-initiated') {
+      // App-initiated flow
+      if (this.tenantId) {
+        // Tenant already specified, generate auth code directly
+        this.authService.authorize(this.tenantId, this.appId, this.redirectUri).subscribe({
+          next: (response) => {
+            window.location.href = response.redirectUri;
+          },
+          error: (err) => {
+            console.error('Error authorizing:', err);
+            toast.error('Error al autorizar acceso', {
+              position: 'bottom-right'
+            });
+          }
+        });
+      } else {
+        // Go to tenant selector
+        this.router.navigate(['/dashboard/select-tenant'], {
+          queryParams: {
+            redirect_uri: this.redirectUri,
+            app_id: this.appId
+          }
+        });
+      }
+    } else {
+      // Direct login - go to SSO dashboard
+      this.router.navigate(['/dashboard']);
+    }
   }
   toggleRememberButton() {
     this.form.controls['remember'].patchValue(

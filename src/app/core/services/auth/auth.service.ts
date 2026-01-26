@@ -1,7 +1,48 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
+export interface SignInResponse {
+  success: boolean;
+  message: string;
+  user: {
+    userId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface UserProfile {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface TenantWithApps {
+  tenantId: string;
+  name: string;
+  slug: string;
+  apps: Array<{
+    appId: string;
+    name: string;
+    url: string;
+    description: string;
+  }>;
+}
+
+export interface AuthorizeResponse {
+  success: boolean;
+  authCode: string;
+  redirectUri: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -10,75 +51,149 @@ export class AuthService {
   baseUrl = environment.baseUrl;
   constructor(private readonly http: HttpClient) {}
 
-  signIn(nit: string, password: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/auth/signin`, {
-      nuid: nit,
-      password,
-    });
-  }
-  signUp(values: any) {
-    return this.http.post(`${this.baseUrl}/api/v1/auth/signup`, values);
-  }
+  /**
+   * Sign in - creates SSO session cookie
+   */
+  signIn(emailOrNuid: string, password: string): Observable<SignInResponse> {
+    // Detect if it's an email or nuid
+    const isEmail = emailOrNuid.includes('@');
+    const payload = isEmail
+      ? { email: emailOrNuid, password }
+      : { nuid: emailOrNuid, password };
 
-  sendEmailOtpCode(email: string, userId: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/email-verification/send`, {
-      email,
-      userId: userId
-    });
-  }
-  validateEmailRecovery(newPassword: string, otp: string) {
-    return this.http.post(
-      `${this.baseUrl}/api/v1/verify/validate_email_recovery`,
-      {
-        newPassword,
-        otp,
-      },
+    return this.http.post<SignInResponse>(
+      `${this.baseUrl}/api/v1/auth/signin`,
+      payload,
+      { withCredentials: true }
     );
   }
-  sendEmailRecovery(nit: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/verify/send_email_recovery`, {
-      credentials: {
-        nit,
-      },
-    });
-  }
-  validateEmailOtpCode(nit: string, code: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/verify/email_code`, {
-      credentials: {
-        nit,
-      },
-      code,
-    });
+
+  /**
+   * Sign up new user
+   */
+  signUp(values: any): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/auth/signup`,
+      values,
+      { withCredentials: true }
+    );
   }
 
-  verifyEmailToken(token: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/email-verification/verify`, {
-      token,
-    });
+  /**
+   * Get current user profile (authenticated with SSO cookie)
+   */
+  getProfile(): Observable<UserProfile> {
+    return this.http.get<UserProfile>(
+      `${this.baseUrl}/api/v1/user/profile`,
+      { withCredentials: true }
+    );
   }
 
-  generateOTP(userId: string, name: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/otp/generate`, {
-      userId,
-      name,
-    });
+  /**
+   * Get user tenants with apps
+   */
+  getUserTenants(): Observable<{ success: boolean; tenants: TenantWithApps[] }> {
+    return this.http.get<{ success: boolean; tenants: TenantWithApps[] }>(
+      `${this.baseUrl}/api/v1/user/tenants`,
+      { withCredentials: true }
+    );
   }
 
-  verifyOTP(userId: string, token: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/otp/verify`, {
-      userId,
-      token,
-    });
+  /**
+   * Generate authorization code for app access
+   */
+  authorize(tenantId: string, appId: string, redirectUri: string): Observable<AuthorizeResponse> {
+    return this.http.post<AuthorizeResponse>(
+      `${this.baseUrl}/api/v1/auth/authorize`,
+      { tenantId, appId, redirectUri },
+      { withCredentials: true }
+    );
   }
 
-  validateOTP(tempToken: string, token: string) {
-    return this.http.post(`${this.baseUrl}/api/v1/otp/validate`, {
-      tempToken,
-      token,
-    });
+  /**
+   * Logout - clears SSO session
+   */
+  logout(): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/auth/logout`,
+      {},
+      { withCredentials: true }
+    ).pipe(
+      tap(() => {
+        // Cookie cleared by backend
+      })
+    );
   }
 
-  checkOTPStatus(userId: string) {
-    return this.http.get(`${this.baseUrl}/api/v1/otp/status/${userId}`);
+  /**
+   * Password recovery
+   */
+  sendEmailRecovery(nit: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/auth/forgot-password`,
+      { nit },
+      { withCredentials: true }
+    );
+  }
+
+  validateEmailRecovery(password: string, otp: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/auth/reset-password`,
+      { password, otp },
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * Email verification
+   */
+  sendEmailOtpCode(email: string, userId: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/email-verification/send`,
+      { email, userId },
+      { withCredentials: true }
+    );
+  }
+
+  verifyEmailToken(token: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/email-verification/verify`,
+      { token },
+      { withCredentials: true }
+    );
+  }
+
+  /**
+   * 2FA/TOTP methods
+   */
+  generateOTP(userId: string, name: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/otp/generate`,
+      { userId, name },
+      { withCredentials: true }
+    );
+  }
+
+  verifyOTP(userId: string, token: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/otp/verify`,
+      { userId, token },
+      { withCredentials: true }
+    );
+  }
+
+  validateOTP(tempToken: string, token: string): Observable<any> {
+    return this.http.post(
+      `${this.baseUrl}/api/v1/otp/validate`,
+      { tempToken, token },
+      { withCredentials: true }
+    );
+  }
+
+  checkOTPStatus(userId: string): Observable<any> {
+    return this.http.get(
+      `${this.baseUrl}/api/v1/otp/status/${userId}`,
+      { withCredentials: true }
+    );
   }
 }

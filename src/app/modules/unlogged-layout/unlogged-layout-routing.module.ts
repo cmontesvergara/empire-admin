@@ -9,12 +9,6 @@ const routes: Routes = [
     component: UnloggedLayoutComponent,
     loadChildren: () => import('../home/home.module').then((m) => m.HomeModule),
   },
-
-  {
-    path: 'components',
-    component: UnloggedLayoutComponent,
-    loadChildren: () => import('../uikit/uikit.module').then((m) => m.UikitModule),
-  },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },
 ];
