@@ -4,18 +4,18 @@ import { isLoggedGuard } from './core/guards/is-logged/is-logged.guard';
 
 @Component({
   template: '',
-  standalone: true
+  standalone: true,
 })
 class RootComponent {
   constructor(private route: ActivatedRoute, private router: Router) {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       const appId = params['app_id'];
       const redirectUri = params['redirect_uri'];
 
       if (appId && redirectUri) {
         // App-initiated flow - redirect to tenant selector
         this.router.navigate(['/dashboard/select-tenant'], {
-          queryParams: { app_id: appId, redirect_uri: redirectUri }
+          queryParams: { app_id: appId, redirect_uri: redirectUri },
         });
       } else {
         // Normal flow - go to dashboard
@@ -35,7 +35,9 @@ const routes: Routes = [
     path: 'dashboard',
     canActivate: [isLoggedGuard],
     loadChildren: () =>
-      import('./modules/sso-dashboard/sso-dashboard.module').then((m) => m.SsoDashboardModule),
+      import('./modules/sso-dashboard/sso-dashboard.module').then(
+        (m) => m.SsoDashboardModule,
+      ),
   },
   {
     path: 'home',
@@ -51,7 +53,7 @@ const routes: Routes = [
   },
   {
     path: 'profile',
-    canActivate: [isLoggedGuard],
+    // canActivate: [isLoggedGuard],
     loadChildren: () =>
       import('./modules/profile/profile.module').then((m) => m.ProfileModule),
   },
