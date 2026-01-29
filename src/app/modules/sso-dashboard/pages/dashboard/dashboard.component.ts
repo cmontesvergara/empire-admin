@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService, TenantWithApps, UserProfile } from 'src/app/core/services/auth/auth.service';
+import {
+  AuthService,
+  TenantWithApps,
+  UserProfile,
+} from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
   user: UserProfile | null = null;
@@ -13,10 +17,7 @@ export class DashboardComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   async ngOnInit() {
     try {
@@ -37,7 +38,7 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         console.error('Error loading profile:', err);
         throw err;
-      }
+      },
     });
   }
 
@@ -49,13 +50,13 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         console.error('Error loading tenants:', err);
         throw err;
-      }
+      },
     });
   }
 
   async launchApp(tenantId: string, appId: string, appUrl: string) {
     try {
-      const redirectUri = `${appUrl}/callback`;
+      const redirectUri = `${appUrl}/auth/callback`;
 
       this.authService.authorize(tenantId, appId, redirectUri).subscribe({
         next: (response) => {
@@ -65,7 +66,7 @@ export class DashboardComponent implements OnInit {
         error: (err) => {
           console.error('Error launching app:', err);
           alert('Error al lanzar aplicación');
-        }
+        },
       });
     } catch (error) {
       console.error('Error:', error);
