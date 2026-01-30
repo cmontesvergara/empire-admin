@@ -2,6 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { SystemRole, TenantWithApps, UserProfile } from '../../models';
+
+// Re-export for backwards compatibility
+export { SystemRole, TenantWithApps, UserProfile };
 
 export interface SignInResponse {
   success: boolean;
@@ -11,6 +15,7 @@ export interface SignInResponse {
     email: string;
     firstName: string;
     lastName: string;
+    systemRole?: SystemRole;
   };
   accessToken: string;
   refreshToken: string;
@@ -23,40 +28,6 @@ export interface Address {
   city: string;
   detail: string;
   postalCode?: string;
-}
-
-export interface UserProfile {
-  userId: string;
-  email: string;
-  firstName: string;
-  secondName?: string;
-  lastName: string;
-  secondLastName?: string;
-  phone: string;
-  nuid: string;
-  birthDate?: string;
-  gender?: string;
-  nationality?: string;
-  birthPlace?: string;
-  placeOfResidence?: string;
-  occupation?: string;
-  maritalStatus?: string;
-  userStatus: string;
-  isActive: boolean;
-  createdAt: string;
-  addresses: Address[];
-}
-
-export interface TenantWithApps {
-  tenantId: string;
-  name: string;
-  slug: string;
-  apps: Array<{
-    appId: string;
-    name: string;
-    url: string;
-    description: string;
-  }>;
 }
 
 export interface AuthorizeResponse {

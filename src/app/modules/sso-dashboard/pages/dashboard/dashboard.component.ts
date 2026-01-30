@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { SystemRole } from 'src/app/core/models';
 import {
-  AuthService,
-  TenantWithApps,
-  UserProfile,
+    AuthService,
+    TenantWithApps,
+    UserProfile,
 } from 'src/app/core/services/auth/auth.service';
 
 @Component({
@@ -80,5 +81,16 @@ export class DashboardComponent implements OnInit {
 
   goToSecurity() {
     this.router.navigate(['/security']);
+  }
+
+  goToAdmin() {
+    this.router.navigate(['/admin']);
+  }
+
+  isSystemAdmin(): boolean {
+    return (
+      this.user?.systemRole === SystemRole.SYSTEM_ADMIN ||
+      this.user?.systemRole === SystemRole.SUPER_ADMIN
+    );
   }
 }
