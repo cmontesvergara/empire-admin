@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
     SystemRole,
     Tenant,
@@ -15,7 +15,7 @@ import { TenantManagementService } from 'src/app/core/services/tenant-management
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './tenants.component.html',
   styleUrl: './tenants.component.scss',
 })

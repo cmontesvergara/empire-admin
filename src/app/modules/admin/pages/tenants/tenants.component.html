@@ -96,6 +96,11 @@
                   class="text-primary-600 hover:text-primary-900 mr-3">
                   Ver Miembros
                 </button>
+                <a
+                  [routerLink]="['/admin/roles', tenant.id]"
+                  class="text-blue-600 hover:text-blue-900">
+                  Gestionar Roles
+                </a>
               </td>
             </tr>
             <tr *ngIf="tenants.length === 0">

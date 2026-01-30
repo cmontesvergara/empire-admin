@@ -210,3 +210,35 @@ export interface InviteTenantMemberDto {
 export interface UpdateMemberRoleDto {
   role: TenantRole;
 }
+
+/**
+ * Custom Role models
+ */
+export interface CustomRole {
+  id: string;
+  tenantId: string;
+  name: string;
+  createdAt: string;
+  permissions?: Permission[];
+}
+
+export interface Permission {
+  id: string;
+  resource: string;
+  action: string;
+  createdAt: string;
+}
+
+export interface CreateRoleDto {
+  name: string;
+  tenantId: string;
+}
+
+export interface UpdateRoleDto {
+  name?: string;
+}
+
+export interface CreatePermissionDto {
+  resource: string;
+  action: string;
+}
