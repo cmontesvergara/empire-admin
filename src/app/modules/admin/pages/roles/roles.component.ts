@@ -3,13 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
-    CreatePermissionDto,
-    CreateRoleDto,
-    CustomRole,
-    Permission,
-    Tenant,
-    TenantRole,
-    UserProfile,
+  CreatePermissionDto,
+  CreateRoleDto,
+  CustomRole,
+  Permission,
+  Tenant,
+  TenantRole,
+  UserProfile,
 } from 'src/app/core/models';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { RoleManagementService } from 'src/app/core/services/role-management.service';
@@ -103,9 +103,15 @@ export class RolesComponent implements OnInit {
   }
 
   async loadTenant() {
-    this.tenantService.getTenant(this.tenantId).subscribe({
+    // First, get all user's tenants to find the role
+    this.tenantService.getAllTenants().subscribe({
       next: (response) => {
-        this.tenant = response.tenant;
+        const userTenant = response.tenants.find((t) => t.id === this.tenantId);
+        if (userTenant) {
+          this.tenant = userTenant;
+        } else {
+          this.error = 'No tienes acceso a este tenant';
+        }
       },
       error: (err) => {
         console.error('Error loading tenant:', err);
