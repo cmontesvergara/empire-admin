@@ -16,14 +16,35 @@ export interface SignInResponse {
   refreshToken: string;
 }
 
+export interface Address {
+  id: string;
+  country: string;
+  province: string;
+  city: string;
+  detail: string;
+  postalCode?: string;
+}
+
 export interface UserProfile {
   userId: string;
   email: string;
   firstName: string;
+  secondName?: string;
   lastName: string;
+  secondLastName?: string;
   phone: string;
+  nuid: string;
+  birthDate?: string;
+  gender?: string;
+  nationality?: string;
+  birthPlace?: string;
+  placeOfResidence?: string;
+  occupation?: string;
+  maritalStatus?: string;
+  userStatus: string;
   isActive: boolean;
   createdAt: string;
+  addresses: Address[];
 }
 
 export interface TenantWithApps {
@@ -64,7 +85,7 @@ export class AuthService {
     return this.http.post<SignInResponse>(
       `${this.baseUrl}/api/v1/auth/signin`,
       payload,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -72,41 +93,61 @@ export class AuthService {
    * Sign up new user
    */
   signUp(values: any): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}/api/v1/auth/signup`,
-      values,
-      { withCredentials: true }
-    );
+    return this.http.post(`${this.baseUrl}/api/v1/auth/signup`, values, {
+      withCredentials: true,
+    });
   }
 
   /**
    * Get current user profile (authenticated with SSO cookie)
    */
-  getProfile(): Observable<UserProfile> {
-    return this.http.get<UserProfile>(
+  getProfile(): Observable<{ success: boolean; user: UserProfile }> {
+    return this.http.get<{ success: boolean; user: UserProfile }>(
       `${this.baseUrl}/api/v1/user/profile`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
+  }
+
+  /**
+   * Update current user profile (authenticated with SSO cookie)
+   */
+  updateProfile(
+    profileData: Partial<UserProfile>,
+  ): Observable<{ success: boolean; message: string; user: UserProfile }> {
+    return this.http.put<{
+      success: boolean;
+      message: string;
+      user: UserProfile;
+    }>(`${this.baseUrl}/api/v1/user/profile`, profileData, {
+      withCredentials: true,
+    });
   }
 
   /**
    * Get user tenants with apps
    */
-  getUserTenants(): Observable<{ success: boolean; tenants: TenantWithApps[] }> {
+  getUserTenants(): Observable<{
+    success: boolean;
+    tenants: TenantWithApps[];
+  }> {
     return this.http.get<{ success: boolean; tenants: TenantWithApps[] }>(
       `${this.baseUrl}/api/v1/user/tenants`,
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   /**
    * Generate authorization code for app access
    */
-  authorize(tenantId: string, appId: string, redirectUri: string): Observable<AuthorizeResponse> {
+  authorize(
+    tenantId: string,
+    appId: string,
+    redirectUri: string,
+  ): Observable<AuthorizeResponse> {
     return this.http.post<AuthorizeResponse>(
       `${this.baseUrl}/api/v1/auth/authorize`,
       { tenantId, appId, redirectUri },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -114,15 +155,13 @@ export class AuthService {
    * Logout - clears SSO session
    */
   logout(): Observable<any> {
-    return this.http.post(
-      `${this.baseUrl}/api/v1/auth/logout`,
-      {},
-      { withCredentials: true }
-    ).pipe(
-      tap(() => {
-        // Cookie cleared by backend
-      })
-    );
+    return this.http
+      .post(`${this.baseUrl}/api/v1/auth/logout`, {}, { withCredentials: true })
+      .pipe(
+        tap(() => {
+          // Cookie cleared by backend
+        }),
+      );
   }
 
   /**
@@ -132,7 +171,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/auth/forgot-password`,
       { nit },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -140,7 +179,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/auth/reset-password`,
       { password, otp },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -151,7 +190,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/email-verification/send`,
       { email, userId },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -159,7 +198,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/email-verification/verify`,
       { token },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -170,7 +209,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/otp/generate`,
       { userId, name },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -178,7 +217,7 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/otp/verify`,
       { userId, token },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
@@ -186,14 +225,13 @@ export class AuthService {
     return this.http.post(
       `${this.baseUrl}/api/v1/otp/validate`,
       { tempToken, token },
-      { withCredentials: true }
+      { withCredentials: true },
     );
   }
 
   checkOTPStatus(userId: string): Observable<any> {
-    return this.http.get(
-      `${this.baseUrl}/api/v1/otp/status/${userId}`,
-      { withCredentials: true }
-    );
+    return this.http.get(`${this.baseUrl}/api/v1/otp/status/${userId}`, {
+      withCredentials: true,
+    });
   }
 }

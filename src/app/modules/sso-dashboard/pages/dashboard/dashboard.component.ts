@@ -32,8 +32,8 @@ export class DashboardComponent implements OnInit {
 
   async loadUserData() {
     this.authService.getProfile().subscribe({
-      next: (profile) => {
-        this.user = profile;
+      next: (response) => {
+        this.user = response.user;
       },
       error: (err) => {
         console.error('Error loading profile:', err);

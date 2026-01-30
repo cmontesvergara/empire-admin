@@ -10,10 +10,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import {
+  AuthService,
+  UserProfile,
+} from 'src/app/core/services/auth/auth.service';
 import { LoadingService } from 'src/app/core/services/loading/loading.service';
-import { UserService } from 'src/app/core/services/user/user.service';
 import { UtilService } from 'src/app/core/services/util/util.service';
-import { UserBasicInformation } from '../../models/user-basic-information';
 
 @Component({
   selector: 'app-personal-information',
@@ -23,15 +25,15 @@ import { UserBasicInformation } from '../../models/user-basic-information';
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
 })
 export class PersonalInformationComponent implements OnInit {
-  userBasicInformation: UserBasicInformation = <UserBasicInformation>{};
+  userProfile: UserProfile | null = null;
   userForm!: FormGroup;
   genders = [{ value: '', label: 'No especificado' }];
   maritalStatuses = [{ value: '', label: 'No especificado' }];
   countries = [{ code: '', name: 'No especificado' }];
 
-  // Mock data
+  // User data for form binding
   user = {
-    nit: '',
+    nuid: '',
     first_name: '',
     second_name: '',
     last_name: '',
@@ -45,10 +47,8 @@ export class PersonalInformationComponent implements OnInit {
         country: '',
       },
     ],
-    phone_landline: '',
     mobile_phone: '',
     email: '',
-    social_media: '',
     gender: '',
     nationality: '',
     marital_status: '',
@@ -61,7 +61,7 @@ export class PersonalInformationComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly utilService: UtilService,
-    private readonly userService: UserService,
+    private readonly authService: AuthService,
     private readonly loadingService: LoadingService,
     private readonly router: Router,
   ) {
@@ -70,43 +70,80 @@ export class PersonalInformationComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const gendersResponse: any = await firstValueFrom(
-      this.utilService.getGenders(),
-    );
-    this.genders = gendersResponse.genders;
-    const countriesResponse: any = await firstValueFrom(
-      this.utilService.getCountries(),
-    );
-    this.countries = countriesResponse.countries;
-    const maritalStatusesResponse: any = await firstValueFrom(
-      this.utilService.getMaritalStatuses(),
-    );
-    this.maritalStatuses = maritalStatusesResponse.maritalStatuses;
+    try {
+      // Load dropdown data
+      const [gendersResponse, countriesResponse, maritalStatusesResponse]: any =
+        await Promise.all([
+          firstValueFrom(this.utilService.getGenders()),
+          firstValueFrom(this.utilService.getCountries()),
+          firstValueFrom(this.utilService.getMaritalStatuses()),
+        ]);
 
-    this.userService.getUserInformation().subscribe((data: any) => {
-      this.userBasicInformation = data.basic_information;
-      this.user = {
-        ...this.user,
-        nit: this.userBasicInformation.nit,
-        first_name: this.userBasicInformation.first_name,
-        second_name: this.userBasicInformation.second_name || '',
-        last_name: this.userBasicInformation.last_name,
-        second_last_name: this.userBasicInformation.second_last_name || '',
-        nationality: this.userBasicInformation.nationality || '',
-        mobile_phone: this.userBasicInformation.phone,
-        email: this.userBasicInformation.email,
-        user_status: this.userBasicInformation.user_status,
-        addresses: this.userBasicInformation.addresses || [],
-        place_of_residence: this.userBasicInformation.place_of_residence || '',
-        place_of_birth: this.userBasicInformation.place_of_birth || '',
-        marital_status: this.userBasicInformation.marital_status || '',
-        gender: this.userBasicInformation.gender || '',
-        occupation: this.userBasicInformation.occupation || '',
-        birth_date: this.userBasicInformation.birth_date || '',
-      };
-      this.initForm();
+      this.genders = gendersResponse.genders;
+      this.countries = countriesResponse.countries;
+      this.maritalStatuses = maritalStatusesResponse.maritalStatuses;
+
+      // Load user profile from backend
+      const profileResponse: any = await firstValueFrom(
+        this.authService.getProfile(),
+      );
+
+      if (profileResponse.success && profileResponse.user) {
+        this.userProfile = profileResponse.user;
+
+        // Map backend data to component user object
+        const firstAddress = this.userProfile?.addresses?.[0];
+        this.user = {
+          nuid: this.userProfile?.nuid || '',
+          first_name: this.userProfile?.firstName || '',
+          second_name: this.userProfile?.secondName || '',
+          last_name: this.userProfile?.lastName || '',
+          second_last_name: this.userProfile?.secondLastName || '',
+          birth_date: this.userProfile?.birthDate
+            ? this.formatDateForInput(this.userProfile.birthDate)
+            : '',
+          mobile_phone: this.userProfile?.phone || '',
+          email: this.userProfile?.email || '',
+          gender: this.userProfile?.gender || '',
+          nationality: this.userProfile?.nationality || '',
+          marital_status: this.userProfile?.maritalStatus || '',
+          occupation: this.userProfile?.occupation || '',
+          place_of_birth: this.userProfile?.birthPlace || '',
+          place_of_residence: this.userProfile?.placeOfResidence || '',
+          user_status: this.userProfile?.userStatus || '',
+          addresses: firstAddress
+            ? [
+                {
+                  street: firstAddress.detail || '',
+                  city: firstAddress.city || '',
+                  state: firstAddress.province || '',
+                  country: firstAddress.country || '',
+                },
+              ]
+            : [
+                {
+                  street: '',
+                  city: '',
+                  state: '',
+                  country: '',
+                },
+              ],
+        };
+
+        // Reinitialize form with loaded data
+        this.initForm();
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
       this.loadingService.update(false);
-    });
+    }
+  }
+
+  formatDateForInput(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   }
 
   initForm(): void {
@@ -142,17 +179,48 @@ export class PersonalInformationComponent implements OnInit {
 
   saveChanges(): void {
     if (this.userForm.valid) {
-      this.user = {
-        ...this.user,
-        ...this.userForm.value,
-        addresses: [this.userForm.value.addresses],
+      const formValues = this.userForm.value;
+
+      // Prepare data for backend
+      const profileData = {
+        firstName: formValues.first_name,
+        secondName: formValues.second_name,
+        lastName: formValues.last_name,
+        secondLastName: formValues.second_last_name,
+        phone: formValues.mobile_phone,
+        birthDate: formValues.birth_date,
+        gender: formValues.gender,
+        nationality: formValues.nationality,
+        birthPlace: formValues.place_of_birth,
+        placeOfResidence: formValues.place_of_residence,
+        occupation: formValues.occupation,
+        maritalStatus: formValues.marital_status,
+        addresses: [
+          {
+            country: formValues.addresses.country,
+            state: formValues.addresses.state,
+            city: formValues.addresses.city,
+            street: formValues.addresses.street,
+          },
+        ],
       };
-      this.userService
-        .updateUserInformation(this.user)
-        .subscribe((response) => {
-          console.log('Datos actualizados:', response);
-          location.reload()
-        });
+
+      this.loadingService.update(true);
+      this.authService.updateProfile(profileData as any).subscribe({
+        next: (response) => {
+          console.log('Profile updated successfully:', response);
+          alert('Perfil actualizado exitosamente');
+          this.router.navigateByUrl('dashboard/profile');
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+          alert('Error al actualizar el perfil');
+          this.loadingService.update(false);
+        },
+        complete: () => {
+          this.loadingService.update(false);
+        },
+      });
     }
   }
 
