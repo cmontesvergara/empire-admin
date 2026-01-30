@@ -224,6 +224,9 @@ export interface CustomRole {
 
 export interface Permission {
   id: string;
+  applicationId: string;
+  applicationName: string;
+  appId: string;
   resource: string;
   action: string;
   createdAt: string;
@@ -239,6 +242,29 @@ export interface UpdateRoleDto {
 }
 
 export interface CreatePermissionDto {
+  applicationId: string;
   resource: string;
   action: string;
+}
+
+/**
+ * App Resource models
+ */
+export interface AppResource {
+  resource: string;
+  action: string;
+  category: string | null;
+  description: string | null;
+  applicationName: string;
+  appId: string;
+}
+
+export interface RegisterAppResourcesDto {
+  appId: string;
+  resources: Array<{
+    resource: string;
+    action: string;
+    category?: string;
+    description?: string;
+  }>;
 }

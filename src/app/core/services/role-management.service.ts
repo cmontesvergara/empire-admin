@@ -135,6 +135,7 @@ export class RoleManagementService {
    */
   removePermissionByResourceAction(
     roleId: string,
+    applicationId: string,
     resource: string,
     action: string,
   ): Observable<ApiResponse<void>> {
@@ -142,7 +143,7 @@ export class RoleManagementService {
       'DELETE',
       `${this.baseUrl}/api/v1/role/${roleId}/permission`,
       {
-        body: { resource, action },
+        body: { applicationId, resource, action },
         withCredentials: true,
       },
     );

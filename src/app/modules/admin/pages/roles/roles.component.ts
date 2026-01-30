@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  Application,
+  AppResource,
   CreatePermissionDto,
   CreateRoleDto,
   CustomRole,
@@ -11,6 +13,8 @@ import {
   TenantRole,
   UserProfile,
 } from 'src/app/core/models';
+import { AppResourceService } from 'src/app/core/services/app-resource.service';
+import { ApplicationManagementService } from 'src/app/core/services/application-management.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { RoleManagementService } from 'src/app/core/services/role-management.service';
 import { TenantManagementService } from 'src/app/core/services/tenant-management.service';
@@ -53,25 +57,24 @@ export class RolesComponent implements OnInit {
   };
 
   addPermissionForm = {
+    applicationId: '',
     resource: '',
     action: '',
   };
 
-  // Predefined resources and actions
-  availableResources = ['users', 'applications', 'roles', 'permissions'];
-  availableActions = [
-    'create',
-    'read',
-    'update',
-    'delete',
-    'grant_access',
-    'revoke_access',
-  ];
+  // Available apps, resources and actions from backend
+  availableApplications: Application[] = [];
+  availableResources: AppResource[] = [];
+  filteredResources: string[] = [];
+  filteredActions: string[] = [];
+  loadingResources = false;
 
   constructor(
     private roleService: RoleManagementService,
     private tenantService: TenantManagementService,
     private authService: AuthService,
+    private appResourceService: AppResourceService,
+    private applicationManagementService: ApplicationManagementService,
     private route: ActivatedRoute,
     private router: Router,
   ) {}
@@ -229,9 +232,11 @@ export class RolesComponent implements OnInit {
 
   openAddPermissionModal() {
     this.addPermissionForm = {
+      applicationId: '',
       resource: '',
       action: '',
     };
+    this.loadAvailableResources();
     this.showAddPermissionModal = true;
     this.error = null;
     this.success = null;
@@ -251,6 +256,101 @@ export class RolesComponent implements OnInit {
   closeDeletePermissionModal() {
     this.showDeletePermissionModal = false;
     this.selectedPermission = null;
+  }
+
+  // Load available resources for tenant
+  async loadAvailableResources() {
+    this.loadingResources = true;
+    this.error = null;
+
+    this.appResourceService
+      .getAvailableResourcesForTenant(this.tenantId)
+      .subscribe({
+        next: (response) => {
+          this.availableResources = response.resources;
+
+          // Get unique applications
+          const appMap = new Map<string, Application>();
+          this.availableResources.forEach((resource) => {
+            if (!appMap.has(resource.appId)) {
+              appMap.set(resource.appId, {
+                id: '', // We don't have full app data, but appId is enough
+                appId: resource.appId,
+                name: resource.applicationName,
+                url: '',
+                description: null,
+                logoUrl: null,
+                isActive: true,
+                createdAt: '',
+                updatedAt: '',
+              });
+            }
+          });
+          this.availableApplications = Array.from(appMap.values());
+          this.loadingResources = false;
+        },
+        error: (err) => {
+          console.error('Error loading available resources:', err);
+          this.error =
+            err.error?.message || 'Error al cargar recursos disponibles';
+          this.loadingResources = false;
+        },
+      });
+  }
+
+  // Filter resources when application changes
+  onApplicationChange() {
+    if (!this.addPermissionForm.applicationId) {
+      this.filteredResources = [];
+      this.filteredActions = [];
+      this.addPermissionForm.resource = '';
+      this.addPermissionForm.action = '';
+      return;
+    }
+
+    const selectedApp = this.availableApplications.find(
+      (app) => app.appId === this.addPermissionForm.applicationId,
+    );
+
+    if (selectedApp) {
+      // Get unique resources for selected app
+      const resourcesForApp = this.availableResources.filter(
+        (r) => r.appId === selectedApp.appId,
+      );
+      this.filteredResources = [
+        ...new Set(resourcesForApp.map((r) => r.resource)),
+      ];
+      this.addPermissionForm.resource = '';
+      this.addPermissionForm.action = '';
+      this.filteredActions = [];
+    }
+  }
+
+  // Filter actions when resource changes
+  onResourceChange() {
+    if (
+      !this.addPermissionForm.resource ||
+      !this.addPermissionForm.applicationId
+    ) {
+      this.filteredActions = [];
+      this.addPermissionForm.action = '';
+      return;
+    }
+
+    const selectedApp = this.availableApplications.find(
+      (app) => app.appId === this.addPermissionForm.applicationId,
+    );
+
+    if (selectedApp) {
+      // Get actions for selected app and resource
+      const actionsForResource = this.availableResources.filter(
+        (r) =>
+          r.appId === selectedApp.appId &&
+          r.resource === this.addPermissionForm.resource,
+      );
+      this.filteredActions = actionsForResource.map((r) => r.action);
+      this.addPermissionForm.action = '';
+    }
   }
 
   // CRUD operations
@@ -332,30 +432,66 @@ export class RolesComponent implements OnInit {
   async addPermission() {
     if (
       !this.selectedRole ||
+      !this.addPermissionForm.applicationId ||
       !this.addPermissionForm.resource ||
       !this.addPermissionForm.action
     ) {
-      this.error = 'Recurso y acción son requeridos';
+      this.error = 'Aplicación, recurso y acción son requeridos';
       return;
     }
 
     this.loadingPermissions = true;
     this.error = null;
 
-    const data: CreatePermissionDto = {
-      resource: this.addPermissionForm.resource,
-      action: this.addPermissionForm.action,
-    };
+    // Find the full application ID from appId
+    const selectedApp = this.availableApplications.find(
+      (app) => app.appId === this.addPermissionForm.applicationId,
+    );
 
-    this.roleService.addPermission(this.selectedRole.id, data).subscribe({
-      next: (response) => {
-        this.success = 'Permiso agregado exitosamente';
-        this.closeAddPermissionModal();
-        this.loadPermissions(this.selectedRole!.id);
+    if (!selectedApp) {
+      this.error = 'Aplicación no encontrada';
+      this.loadingPermissions = false;
+      return;
+    }
+
+    // Get the actual application ID (UUID) from backend
+    this.applicationManagementService.getAllApplications().subscribe({
+      next: (appsResponse: {
+        success: boolean;
+        applications: Application[];
+      }) => {
+        const fullApp = appsResponse.applications.find(
+          (a: Application) => a.appId === selectedApp.appId,
+        );
+
+        if (!fullApp) {
+          this.error = 'No se pudo obtener el ID de la aplicación';
+          this.loadingPermissions = false;
+          return;
+        }
+
+        const data: CreatePermissionDto = {
+          applicationId: fullApp.id,
+          resource: this.addPermissionForm.resource,
+          action: this.addPermissionForm.action,
+        };
+
+        this.roleService.addPermission(this.selectedRole!.id, data).subscribe({
+          next: (response) => {
+            this.success = 'Permiso agregado exitosamente';
+            this.closeAddPermissionModal();
+            this.loadPermissions(this.selectedRole!.id);
+          },
+          error: (err) => {
+            console.error('Error adding permission:', err);
+            this.error = err.error?.message || 'Error al agregar permiso';
+            this.loadingPermissions = false;
+          },
+        });
       },
       error: (err) => {
-        console.error('Error adding permission:', err);
-        this.error = err.error?.message || 'Error al agregar permiso';
+        console.error('Error loading applications:', err);
+        this.error = 'Error al cargar aplicaciones';
         this.loadingPermissions = false;
       },
     });

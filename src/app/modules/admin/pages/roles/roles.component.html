@@ -263,7 +263,12 @@
         <div
           *ngFor="let permission of permissions"
           class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-          <div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                {{ permission.applicationName }}
+              </span>
+            </div>
             <div class="flex items-center gap-2">
               <span class="text-sm font-medium text-gray-900">{{ permission.resource }}</span>
               <span class="text-gray-400">:</span>
@@ -309,17 +314,36 @@
       <form (ngSubmit)="addPermission()">
         <div class="space-y-4">
           <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Aplicación *</label>
+            <select
+              [(ngModel)]="addPermissionForm.applicationId"
+              (ngModelChange)="onApplicationChange()"
+              name="applicationId"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option value="">Selecciona una aplicación</option>
+              <option *ngFor="let app of availableApplications" [value]="app.appId">
+                {{ app.name }}
+              </option>
+            </select>
+          </div>
+          <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Recurso *</label>
             <select
               [(ngModel)]="addPermissionForm.resource"
+              (ngModelChange)="onResourceChange()"
               name="resource"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              [disabled]="!addPermissionForm.applicationId"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100">
               <option value="">Selecciona un recurso</option>
-              <option *ngFor="let resource of availableResources" [value]="resource">
+              <option *ngFor="let resource of filteredResources" [value]="resource">
                 {{ resource }}
               </option>
             </select>
+            <p *ngIf="!addPermissionForm.applicationId" class="mt-1 text-xs text-gray-500">
+              Primero selecciona una aplicación
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Acción *</label>
@@ -327,12 +351,20 @@
               [(ngModel)]="addPermissionForm.action"
               name="action"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              [disabled]="!addPermissionForm.resource"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100">
               <option value="">Selecciona una acción</option>
-              <option *ngFor="let action of availableActions" [value]="action">
+              <option *ngFor="let action of filteredActions" [value]="action">
                 {{ action }}
               </option>
             </select>
+            <p *ngIf="!addPermissionForm.resource" class="mt-1 text-xs text-gray-500">
+              Primero selecciona un recurso
+            </p>
+          </div>
+          <div *ngIf="loadingResources" class="flex items-center justify-center py-4">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+            <span class="ml-2 text-sm text-gray-600">Cargando recursos...</span>
           </div>
         </div>
         <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -347,7 +379,7 @@
           </button>
           <button
             type="submit"
-            [disabled]="loadingPermissions"
+            [disabled]="loadingPermissions || loadingResources"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
             Agregar
           </button>
