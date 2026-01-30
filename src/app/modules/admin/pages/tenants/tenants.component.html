@@ -1,0 +1,395 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Gestión de Tenants</h1>
+          <p class="text-gray-600 mt-1">Administra los tenants y sus miembros</p>
+        </div>
+        <button
+          *ngIf="canCreateTenant()"
+          (click)="openCreateModal()"
+          class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo Tenant
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center h-64">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+    </div>
+
+    <!-- Error/Success Messages -->
+    <div *ngIf="error && !loading" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+      <p class="text-red-800">{{ error }}</p>
+    </div>
+    <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+      <p class="text-green-800">{{ success }}</p>
+    </div>
+
+    <!-- Tenants List -->
+    <div *ngIf="!loading && !error" class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Tenant
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Slug
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Tu Rol
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Miembros
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Creado
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let tenant of tenants" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div
+                      class="h-10 w-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                      <span class="text-white text-sm font-bold">{{ tenant.name.charAt(0) }}</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{{ tenant.name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-sm font-mono text-gray-600">{{ tenant.slug }}</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  *ngIf="tenant.role"
+                  [class]="'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + getRoleBadgeClass(tenant.role)">
+                  {{ getRoleLabel(tenant.role) }}
+                </span>
+                <span *ngIf="!tenant.role" class="text-sm text-gray-400">N/A</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ tenant.memberCount || 0 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ tenant.createdAt | date: 'dd/MM/yyyy' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <button
+                  (click)="openMemberModal(tenant)"
+                  class="text-primary-600 hover:text-primary-900 mr-3">
+                  Ver Miembros
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="tenants.length === 0">
+              <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                No hay tenants disponibles
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Tenant Modal -->
+<div
+  *ngIf="showCreateModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">Crear Nuevo Tenant</h3>
+    </div>
+    <div class="p-6">
+      <form (ngSubmit)="createTenant()">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+            <input
+              type="text"
+              [(ngModel)]="createForm.name"
+              name="name"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="Ej: Empresa ABC" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Slug (opcional)
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="createForm.slug"
+              name="slug"
+              pattern="[a-z0-9-]+"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="Ej: empresa-abc" />
+            <p class="mt-1 text-xs text-gray-500">Solo letras minúsculas, números y guiones</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Email del Admin *
+            </label>
+            <input
+              type="email"
+              [(ngModel)]="createForm.tenantAdminEmail"
+              name="tenantAdminEmail"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="admin@empresa.com" />
+            <p class="mt-1 text-xs text-gray-500">
+              El usuario debe existir y estar activo en el sistema
+            </p>
+          </div>
+        </div>
+        <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+          <p class="text-sm text-red-800">{{ error }}</p>
+        </div>
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeCreateModal()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="loading"
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            Crear Tenant
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Member Management Modal -->
+<div
+  *ngIf="showMemberModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Miembros de {{ selectedTenant?.name }}</h3>
+        <p class="text-sm text-gray-600 mt-1">{{ tenantMembers.length }} miembros</p>
+      </div>
+      <button
+        *ngIf="canManageTenant(selectedTenant!)"
+        (click)="openInviteModal()"
+        class="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">
+        Invitar Usuario
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+      <div *ngIf="loadingMembers" class="flex justify-center items-center h-32">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+
+      <div *ngIf="!loadingMembers" class="space-y-2">
+        <div
+          *ngFor="let member of tenantMembers"
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+          <div class="flex items-center gap-4">
+            <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+              <span class="text-primary-700 font-semibold">
+                {{ member.firstName.charAt(0) }}{{ member.lastName.charAt(0) }}
+              </span>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">
+                {{ member.firstName }} {{ member.lastName }}
+              </div>
+              <div class="text-sm text-gray-500">{{ member.email }}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span
+              [class]="'px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ' + getRoleBadgeClass(member.role)">
+              {{ getRoleLabel(member.role) }}
+            </span>
+            <div *ngIf="canManageTenant(selectedTenant!)" class="flex gap-2">
+              <button
+                (click)="openRoleModal(member)"
+                class="text-primary-600 hover:text-primary-900 text-sm">
+                Cambiar Rol
+              </button>
+              <button
+                (click)="openDeleteModal(member)"
+                class="text-red-600 hover:text-red-900 text-sm">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="tenantMembers.length === 0" class="text-center py-8 text-gray-500">
+          No hay miembros en este tenant
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-gray-200">
+      <button
+        (click)="closeMemberModal()"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite Member Modal -->
+<div
+  *ngIf="showInviteModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">Invitar Usuario</h3>
+    </div>
+    <div class="p-6">
+      <form (ngSubmit)="inviteMember()">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+            <input
+              type="email"
+              [(ngModel)]="inviteForm.email"
+              name="email"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              placeholder="usuario@empresa.com" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Rol *</label>
+            <select
+              [(ngModel)]="inviteForm.role"
+              name="role"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              <option [value]="TenantRole.ADMIN">Admin - Control total</option>
+              <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
+              <option [value]="TenantRole.VIEWER">Visor - Solo lectura</option>
+            </select>
+          </div>
+        </div>
+        <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+          <p class="text-sm text-red-800">{{ error }}</p>
+        </div>
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeInviteModal()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="loadingMembers"
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            Invitar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Change Role Modal -->
+<div
+  *ngIf="showRoleModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">Cambiar Rol</h3>
+    </div>
+    <div class="p-6">
+      <form (ngSubmit)="updateMemberRole()">
+        <div>
+          <p class="text-sm text-gray-600 mb-4">
+            Cambiar rol de <strong>{{ selectedMember?.firstName }} {{ selectedMember?.lastName }}</strong>
+          </p>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nuevo Rol *</label>
+          <select
+            [(ngModel)]="roleForm.role"
+            name="role"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <option [value]="TenantRole.ADMIN">Admin - Control total</option>
+            <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
+            <option [value]="TenantRole.VIEWER">Visor - Solo lectura</option>
+          </select>
+        </div>
+        <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+          <p class="text-sm text-red-800">{{ error }}</p>
+        </div>
+        <div class="mt-6 flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="closeRoleModal()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="loadingMembers"
+            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            Actualizar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Member Modal -->
+<div
+  *ngIf="showDeleteModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900 text-red-600">Eliminar Miembro</h3>
+    </div>
+    <div class="p-6">
+      <p class="text-gray-700">
+        ¿Estás seguro de que deseas eliminar a
+        <strong>{{ selectedMember?.firstName }} {{ selectedMember?.lastName }}</strong> de este tenant?
+      </p>
+      <p class="text-sm text-gray-500 mt-2">Esta acción no se puede deshacer.</p>
+      <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
+        <p class="text-sm text-red-800">{{ error }}</p>
+      </div>
+      <div class="mt-6 flex gap-3 justify-end">
+        <button
+          (click)="closeDeleteModal()"
+          class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button
+          (click)="removeMember()"
+          [disabled]="loadingMembers"
+          class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -173,3 +173,40 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+/**
+ * Tenant models
+ */
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  memberCount?: number;
+  roleCount?: number;
+  createdAt: string;
+  role?: TenantRole;
+}
+
+export interface TenantMember {
+  userId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: TenantRole;
+  joinedAt: string;
+}
+
+export interface CreateTenantDto {
+  name: string;
+  slug?: string;
+  tenantAdminEmail: string;
+}
+
+export interface InviteTenantMemberDto {
+  email: string;
+  role: TenantRole;
+}
+
+export interface UpdateMemberRoleDto {
+  role: TenantRole;
+}

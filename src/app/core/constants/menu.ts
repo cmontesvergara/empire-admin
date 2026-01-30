@@ -27,7 +27,8 @@ export class Menu {
             { label: 'File Renamer', route: '/apps/file-renamer' },
           ],
         },
-        { hidden:true,
+        {
+          hidden: true,
           icon: 'assets/icons/heroicons/outline/lock-closed.svg',
           label: 'Auth',
           route: '/auth',
@@ -39,7 +40,8 @@ export class Menu {
             { label: 'Two Steps', route: '/auth/two-steps' },
           ],
         },
-        { hidden:true,
+        {
+          hidden: true,
           icon: 'assets/icons/heroicons/outline/exclamation-triangle.svg',
           label: 'Errors',
           route: '/errors',
@@ -48,7 +50,8 @@ export class Menu {
             { label: '500', route: '/errors/500' },
           ],
         },
-        { hidden:true,
+        {
+          hidden: true,
           icon: 'assets/icons/heroicons/outline/cube.svg',
           label: 'Components',
           route: '/components',
@@ -83,6 +86,23 @@ export class Menu {
           label: 'Users',
           route: '/users',
           hidden: true,
+        },
+      ],
+    },
+    {
+      group: 'Administración',
+      separator: true,
+      hidden: false,
+      items: [
+        {
+          label: 'Aplicaciones',
+          icon: 'assets/icons/heroicons/outline/cube.svg',
+          route: '/admin/applications',
+        },
+        {
+          label: 'Tenants',
+          icon: 'assets/icons/heroicons/outline/office-building.svg',
+          route: '/admin/tenants',
         },
       ],
     },
