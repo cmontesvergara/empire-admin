@@ -7,10 +7,12 @@ import {
   Tenant,
   TenantMember,
   TenantRole,
-  UserProfile
+  UserProfile,
+  CustomRole
 } from 'src/app/core/models';
 import { ApplicationManagementService } from 'src/app/core/services/application-management.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { RoleManagementService } from 'src/app/core/services/role-management.service';
 import { TenantAppService } from 'src/app/core/services/tenant-app.service';
 import { TenantManagementService } from 'src/app/core/services/tenant-management.service';
 import { UserAppAccessService } from 'src/app/core/services/user-app-access.service';
@@ -61,6 +63,10 @@ export class TenantsComponent implements OnInit {
   TenantRole = TenantRole;
   SystemRole = SystemRole;
 
+  // Custom roles
+  customRoles: CustomRole[] = [];
+  loadingRoles = false;
+
   constructor(
     private tenantService: TenantManagementService,
     private authService: AuthService,
@@ -68,6 +74,7 @@ export class TenantsComponent implements OnInit {
     private applicationService: ApplicationManagementService,
     private tenantAppService: TenantAppService,
     private userAppAccessService: UserAppAccessService,
+    private roleManagementService: RoleManagementService,
   ) { }
 
   async ngOnInit() {
@@ -444,6 +451,31 @@ export class TenantsComponent implements OnInit {
     this.showRoleModal = true;
     this.error = null;
     this.success = null;
+
+    // Load custom roles for this tenant
+    if (this.selectedTenant) {
+      this.loadCustomRoles(this.selectedTenant.id);
+    }
+  }
+
+  /**
+   * Load custom roles for a tenant
+   */
+  loadCustomRoles(tenantId: string) {
+    this.loadingRoles = true;
+    this.roleManagementService.getTenantRoles(tenantId).subscribe({
+      next: (response) => {
+        // Filter out base roles (admin, member, viewer) to get only custom roles
+        this.customRoles = response.roles.filter(
+          (role) => !['admin', 'member', 'viewer'].includes(role.name)
+        );
+        this.loadingRoles = false;
+      },
+      error: (err) => {
+        console.error('Error loading custom roles:', err);
+        this.loadingRoles = false;
+      },
+    });
   }
 
   closeRoleModal() {

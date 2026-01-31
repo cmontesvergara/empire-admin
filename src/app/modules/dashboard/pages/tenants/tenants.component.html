@@ -363,10 +363,20 @@
           <label class="block text-sm font-medium text-gray-700 mb-1">Nuevo Rol *</label>
           <select [(ngModel)]="roleForm.role" name="role" required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
-            <option [value]="TenantRole.ADMIN">Admin - Control total</option>
-            <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
-            <option [value]="TenantRole.VIEWER">Visor - Solo lectura</option>
+            <!-- Base roles -->
+            <optgroup label="Roles Base">
+              <option [value]="TenantRole.ADMIN">Admin - Control total</option>
+              <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
+              <option [value]="TenantRole.VIEWER">Visor - Solo lectura</option>
+            </optgroup>
+            <!-- Custom roles -->
+            <optgroup label="Roles Personalizados" *ngIf="customRoles.length > 0">
+              <option *ngFor="let role of customRoles" [value]="role.name">
+                {{ role.name }}
+              </option>
+            </optgroup>
           </select>
+          <p *ngIf="loadingRoles" class="text-xs text-gray-500 mt-1">Cargando roles personalizados...</p>
         </div>
         <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
           <p class="text-sm text-red-800">{{ error }}</p>
