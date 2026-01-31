@@ -144,7 +144,20 @@ export class TenantsComponent implements OnInit {
   }
 
   canManageTenant(tenant: Tenant): boolean {
+    // Super Admin and System Admin can manage any tenant
+    if (this.isSystemAdmin() || this.isSuperAdmin()) {
+      return true;
+    }
+    // Regular users must be admin of the tenant
     return tenant.role === TenantRole.ADMIN;
+  }
+
+  isSystemAdmin(): boolean {
+    return this.user?.systemRole === SystemRole.SYSTEM_ADMIN;
+  }
+
+  isSuperAdmin(): boolean {
+    return this.user?.systemRole === SystemRole.SUPER_ADMIN;
   }
 
   // Modal controls
