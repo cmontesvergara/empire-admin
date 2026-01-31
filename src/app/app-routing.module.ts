@@ -1,6 +1,5 @@
 import { Component, NgModule } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule, Routes } from '@angular/router';
-import { isLoggedGuard } from './core/guards/is-logged/is-logged.guard';
 
 @Component({
   template: '',
@@ -32,23 +31,9 @@ const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'home',
-    //canActivate: [isLoggedGuard],
-    loadChildren: () =>
-      import('./modules/sso-dashboard/sso-dashboard.module').then(
-        (m) => m.SsoDashboardModule,
-      ),
-  },
-  {
     path: 'auth',
     loadChildren: () =>
       import('./modules/auth/auth.module').then((m) => m.AuthModule),
-  },
-  {
-    path: 'admin',
-    canActivate: [isLoggedGuard],
-    loadChildren: () =>
-      import('./modules/admin/admin.module').then((m) => m.AdminModule),
   },
   {
     path: 'profile',

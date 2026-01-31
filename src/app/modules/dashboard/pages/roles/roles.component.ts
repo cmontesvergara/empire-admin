@@ -522,6 +522,6 @@ export class RolesComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/admin/tenants']);
+    this.router.navigate(['/dashboard/tenants']);
   }
 }

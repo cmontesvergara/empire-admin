@@ -2,17 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SystemRole } from 'src/app/core/models';
 import {
-    AuthService,
-    TenantWithApps,
-    UserProfile,
+  AuthService,
+  TenantWithApps,
+  UserProfile,
 } from 'src/app/core/services/auth/auth.service';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss'],
+  selector: 'app-home',
+  standalone: true,
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class HomeComponent implements OnInit {
   user: UserProfile | null = null;
   tenants: TenantWithApps[] = [];
   loading = true;

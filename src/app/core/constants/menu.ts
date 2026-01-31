@@ -102,17 +102,17 @@ export class Menu {
         {
           label: 'Aplicaciones',
           icon: 'assets/icons/heroicons/outline/cube.svg',
-          route: '/admin/applications',
+          route: '/dashboard/applications',
         },
         {
           label: 'Tenants',
           icon: 'assets/icons/heroicons/outline/office-building.svg',
-          route: '/admin/tenants',
+          route: '/dashboard/tenants',
         },
         {
           label: 'Roles',
           icon: 'assets/icons/heroicons/outline/user-group.svg',
-          route: '/admin/roles',
+          route: '/dashboard/roles',
         },
       ],
     },

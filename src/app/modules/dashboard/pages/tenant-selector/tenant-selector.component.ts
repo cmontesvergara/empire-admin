@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService, TenantWithApps } from 'src/app/core/services/auth/auth.service';
+import {
+  AuthService,
+  TenantWithApps,
+} from 'src/app/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-tenant-selector',
+  standalone: true,
   templateUrl: './tenant-selector.component.html',
-  styleUrls: ['./tenant-selector.component.scss']
+  styleUrls: ['./tenant-selector.component.scss'],
 })
 export class TenantSelectorComponent implements OnInit {
   tenants: TenantWithApps[] = [];
@@ -17,7 +21,7 @@ export class TenantSelectorComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit() {
@@ -39,8 +43,8 @@ export class TenantSelectorComponent implements OnInit {
       next: (response) => {
         // Filter tenants by app access
         if (this.appId) {
-          this.tenants = response.tenants.filter(t =>
-            t.apps.some(app => app.appId === this.appId)
+          this.tenants = response.tenants.filter((t) =>
+            t.apps.some((app) => app.appId === this.appId),
           );
         } else {
           this.tenants = response.tenants;
@@ -60,7 +64,7 @@ export class TenantSelectorComponent implements OnInit {
         console.error('Error loading tenants:', err);
         this.loading = false;
         alert('Error al cargar organizaciones');
-      }
+      },
     });
   }
 
@@ -69,16 +73,18 @@ export class TenantSelectorComponent implements OnInit {
 
     this.selecting = true;
 
-    this.authService.authorize(tenantId, this.appId, this.redirectUri).subscribe({
-      next: (response) => {
-        // Redirect to app with auth code
-        window.location.href = response.redirectUri;
-      },
-      error: (err) => {
-        console.error('Error authorizing:', err);
-        this.selecting = false;
-        alert('Error al autorizar acceso');
-      }
-    });
+    this.authService
+      .authorize(tenantId, this.appId, this.redirectUri)
+      .subscribe({
+        next: (response) => {
+          // Redirect to app with auth code
+          window.location.href = response.redirectUri;
+        },
+        error: (err) => {
+          console.error('Error authorizing:', err);
+          this.selecting = false;
+          alert('Error al autorizar acceso');
+        },
+      });
   }
 }
