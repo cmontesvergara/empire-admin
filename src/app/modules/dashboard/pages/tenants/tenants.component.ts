@@ -3,13 +3,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
-    SystemRole,
-    Tenant,
-    TenantMember,
-    TenantRole,
-    UserProfile,
+  Application, SystemRole,
+  Tenant,
+  TenantMember,
+  TenantRole,
+  UserProfile
 } from 'src/app/core/models';
+import { ApplicationManagementService } from 'src/app/core/services/application-management.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { TenantAppService } from 'src/app/core/services/tenant-app.service';
 import { TenantManagementService } from 'src/app/core/services/tenant-management.service';
 
 @Component({
@@ -61,6 +63,8 @@ export class TenantsComponent implements OnInit {
     private tenantService: TenantManagementService,
     private authService: AuthService,
     private router: Router,
+    private applicationService: ApplicationManagementService,
+    private tenantAppService: TenantAppService,
   ) {}
 
   async ngOnInit() {
@@ -134,6 +138,7 @@ export class TenantsComponent implements OnInit {
   }
 
   // Modal controls
+
   openCreateModal() {
     this.createForm = {
       name: '',
@@ -143,6 +148,78 @@ export class TenantsComponent implements OnInit {
     this.showCreateModal = true;
     this.error = null;
     this.success = null;
+  }
+
+  // Apps management modal
+  showAppsModal = false;
+  tenantApps: Application[] = [];
+  availableApps: Application[] = [];
+  appsSearch = '';
+
+  get tenantAppsFiltered(): Application[] {
+    return this.tenantApps.filter((app) =>
+      app.name.toLowerCase().includes(this.appsSearch.toLowerCase()),
+    );
+  }
+  get availableAppsFiltered(): Application[] {
+    return this.availableApps.filter((app) =>
+      app.name.toLowerCase().includes(this.appsSearch.toLowerCase()),
+    );
+  }
+
+  canManageApps(tenant: Tenant): boolean {
+    return (
+      this.user?.systemRole === SystemRole.SYSTEM_ADMIN ||
+      this.user?.systemRole === SystemRole.SUPER_ADMIN
+    );
+  }
+
+  openAppsModal(tenant: Tenant) {
+    this.selectedTenant = tenant;
+    this.showAppsModal = true;
+    this.loadTenantAppsAndAvailable();
+  }
+
+  closeAppsModal() {
+    this.showAppsModal = false;
+    this.selectedTenant = null;
+    this.tenantApps = [];
+    this.availableApps = [];
+    this.appsSearch = '';
+  }
+
+  loadTenantAppsAndAvailable() {
+    if (!this.selectedTenant) return;
+    this.tenantAppService.getTenantApps(this.selectedTenant.id).subscribe({
+      next: (res) => {
+        this.tenantApps = res.applications;
+        this.applicationService.getAllApplications().subscribe({
+          next: (appsRes) => {
+            this.availableApps = appsRes.applications.filter(
+              (app) => !this.tenantApps.some((a) => a.id === app.id),
+            );
+          },
+        });
+      },
+    });
+  }
+
+  addAppToTenant(app: Application) {
+    if (!this.selectedTenant) return;
+    this.tenantAppService
+      .addAppToTenant(this.selectedTenant.id, app.id)
+      .subscribe({
+        next: () => this.loadTenantAppsAndAvailable(),
+      });
+  }
+
+  removeAppFromTenant(app: Application) {
+    if (!this.selectedTenant) return;
+    this.tenantAppService
+      .removeAppFromTenant(this.selectedTenant.id, app.id)
+      .subscribe({
+        next: () => this.loadTenantAppsAndAvailable(),
+      });
   }
 
   closeCreateModal() {

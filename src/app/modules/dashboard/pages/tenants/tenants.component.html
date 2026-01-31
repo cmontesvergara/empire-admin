@@ -98,9 +98,62 @@
                 </button>
                 <a
                   [routerLink]="['/dashboard/roles', tenant.id]"
-                  class="text-blue-600 hover:text-blue-900">
+                  class="text-blue-600 hover:text-blue-900 mr-3">
                   Gestionar Roles
                 </a>
+                <button
+                  *ngIf="canManageApps(tenant)"
+                  (click)="openAppsModal(tenant)"
+                  class="text-green-600 hover:text-green-900">
+                  Gestionar Apps
+                </button>
+              <!-- Apps Management Modal -->
+              <div
+                *ngIf="showAppsModal"
+                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[70] flex items-center justify-center">
+                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                  <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                      <h3 class="text-lg font-semibold text-gray-900">Gestionar Apps de {{ selectedTenant?.name }}</h3>
+                      <p class="text-sm text-gray-600 mt-1">Agrega o quita aplicaciones asociadas a este tenant</p>
+                    </div>
+                    <button (click)="closeAppsModal()" class="text-gray-500 hover:text-gray-800">✕</button>
+                  </div>
+                  <div class="p-6 flex-1 overflow-y-auto">
+                    <!-- Buscador -->
+                    <input type="text" [(ngModel)]="appsSearch" placeholder="Buscar apps..." class="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg" />
+                    <!-- Apps asociadas -->
+                    <h4 class="font-semibold mb-2">Apps asociadas</h4>
+                    <div *ngIf="tenantAppsFiltered.length; else noAppsAsociadas">
+                      <ul>
+                        <li *ngFor="let app of tenantAppsFiltered" class="flex items-center justify-between py-2 border-b last:border-b-0">
+                          <span>{{ app.name }}</span>
+                          <button (click)="removeAppFromTenant(app)" class="text-red-600 hover:text-red-900 text-xs">Quitar</button>
+                        </li>
+                      </ul>
+                    </div>
+                    <ng-template #noAppsAsociadas>
+                      <div class="text-gray-400 text-sm mb-4">No hay apps asociadas</div>
+                    </ng-template>
+                    <!-- Apps disponibles -->
+                    <h4 class="font-semibold mt-6 mb-2">Apps disponibles</h4>
+                    <div *ngIf="availableAppsFiltered.length; else noAppsDisponibles">
+                      <ul>
+                        <li *ngFor="let app of availableAppsFiltered" class="flex items-center justify-between py-2 border-b last:border-b-0">
+                          <span>{{ app.name }}</span>
+                          <button (click)="addAppToTenant(app)" class="text-green-600 hover:text-green-900 text-xs">Agregar</button>
+                        </li>
+                      </ul>
+                    </div>
+                    <ng-template #noAppsDisponibles>
+                      <div class="text-gray-400 text-sm">No hay apps disponibles para agregar</div>
+                    </ng-template>
+                  </div>
+                  <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                    <button (click)="closeAppsModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cerrar</button>
+                  </div>
+                </div>
+              </div>
               </td>
             </tr>
             <tr *ngIf="tenants.length === 0">
