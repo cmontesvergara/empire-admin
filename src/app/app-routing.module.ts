@@ -58,12 +58,13 @@ const routes: Routes = [
   },
   {
     path: 'home',
-    // canActivate: [isLoggedGuard],
+    //canActivate: [isLoggedGuard],
     loadChildren: () =>
-      import('./modules/dashboard-old/dashboard.module').then(
-        (m) => m.DashboardModule,
+      import('./modules/logged-layout/logged-layout.module').then(
+        (m) => m.LoggedLayoutModule,
       ),
   },
+
   {
     path: 'errors',
     loadChildren: () =>
