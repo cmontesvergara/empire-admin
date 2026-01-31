@@ -7,9 +7,7 @@ const routes: Routes = [
     path: '',
     component: LoggedLayoutComponent,
     loadChildren: () =>
-      import('../dashboard-old/dashboard.module').then(
-        (m) => m.DashboardModule,
-      ),
+      import('../dashboard/dashboard.module').then((m) => m.DashboardModule),
   },
   {
     path: 'util',
@@ -22,12 +20,12 @@ const routes: Routes = [
     loadChildren: () =>
       import('../profile/profile.module').then((m) => m.ProfileModule),
   },
-  // {
-  //   path: 'components',
-  //   component: LoggedLayoutComponent,
-  //   loadChildren: () =>
-  //     import('../uikit/uikit.module').then((m) => m.UikitModule),
-  // },
+  {
+    path: 'components',
+    component: LoggedLayoutComponent,
+    loadChildren: () =>
+      import('../uikit/uikit.module').then((m) => m.UikitModule),
+  },
 
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: 'error/404' },

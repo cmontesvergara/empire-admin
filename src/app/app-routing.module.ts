@@ -28,12 +28,12 @@ class RootComponent {
 const routes: Routes = [
   {
     path: '',
-    component: RootComponent,
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {
-    path: 'dashboard',
-    canActivate: [isLoggedGuard],
+    path: 'home',
+    //canActivate: [isLoggedGuard],
     loadChildren: () =>
       import('./modules/sso-dashboard/sso-dashboard.module').then(
         (m) => m.SsoDashboardModule,
@@ -57,7 +57,7 @@ const routes: Routes = [
       import('./modules/profile/profile.module').then((m) => m.ProfileModule),
   },
   {
-    path: 'home',
+    path: 'dashboard',
     //canActivate: [isLoggedGuard],
     loadChildren: () =>
       import('./modules/logged-layout/logged-layout.module').then(
