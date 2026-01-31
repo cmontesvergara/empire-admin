@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { systemAdminGuard } from 'src/app/core/guards/system-admin.guard';
-import { HomeComponent } from '../home/home.component';
 import { DashboardComponent } from './dashboard.component';
 import { ApplicationsComponent } from './pages/applications/applications.component';
+import { HomeComponent } from './pages/home/home.component';
 import { NftComponent } from './pages/nft/nft.component';
 import { RolesComponent } from './pages/roles/roles.component';
 import { TenantSelectorComponent } from './pages/tenant-selector/tenant-selector.component';
