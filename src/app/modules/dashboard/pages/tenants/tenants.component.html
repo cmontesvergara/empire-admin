@@ -7,9 +7,7 @@
           <h1 class="text-3xl font-bold text-gray-900">Gestión de Tenants</h1>
           <p class="text-gray-600 mt-1">Administra los tenants y sus miembros</p>
         </div>
-        <button
-          *ngIf="canCreateTenant()"
-          (click)="openCreateModal()"
+        <button *ngIf="canCreateTenant()" (click)="openCreateModal()"
           class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -77,8 +75,7 @@
                 <span class="text-sm font-mono text-gray-600">{{ tenant.slug }}</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  *ngIf="tenant.role"
+                <span *ngIf="tenant.role"
                   [class]="'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + getRoleBadgeClass(tenant.role)">
                   {{ getRoleLabel(tenant.role) }}
                 </span>
@@ -91,69 +88,80 @@
                 {{ tenant.createdAt | date: 'dd/MM/yyyy' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  (click)="openMemberModal(tenant)"
-                  class="text-primary-600 hover:text-primary-900 mr-3">
+                <button (click)="openMemberModal(tenant)" class="text-primary-600 hover:text-primary-900 mr-3">
                   Ver Miembros
                 </button>
-                <a
-                  [routerLink]="['/dashboard/roles', tenant.id]"
-                  class="text-blue-600 hover:text-blue-900 mr-3">
+                <a [routerLink]="['/dashboard/roles', tenant.id]" class="text-blue-600 hover:text-blue-900 mr-3">
                   Gestionar Roles
                 </a>
-                <button
-                  *ngIf="canManageApps(tenant)"
-                  (click)="openAppsModal(tenant)"
+                <button *ngIf="canManageApps(tenant)" (click)="openAppsModal(tenant)"
                   class="text-green-600 hover:text-green-900">
                   Gestionar Apps
                 </button>
-              <!-- Apps Management Modal -->
-              <div
-                *ngIf="showAppsModal"
-                class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[70] flex items-center justify-center">
-                <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
-                  <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                    <div>
-                      <h3 class="text-lg font-semibold text-gray-900">Gestionar Apps de {{ selectedTenant?.name }}</h3>
-                      <p class="text-sm text-gray-600 mt-1">Agrega o quita aplicaciones asociadas a este tenant</p>
+                <!-- Apps Management Modal -->
+                <div *ngIf="showAppsModal"
+                  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[70] flex items-center justify-center">
+                  <div
+                    class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                      <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Gestionar Apps de {{ selectedTenant?.name }}
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-1">Agrega o quita aplicaciones asociadas a este tenant</p>
+                      </div>
+                      <button (click)="closeAppsModal()" class="text-gray-500 hover:text-gray-800">✕</button>
                     </div>
-                    <button (click)="closeAppsModal()" class="text-gray-500 hover:text-gray-800">✕</button>
-                  </div>
-                  <div class="p-6 flex-1 overflow-y-auto">
-                    <!-- Buscador -->
-                    <input type="text" [(ngModel)]="appsSearch" placeholder="Buscar apps..." class="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg" />
-                    <!-- Apps asociadas -->
-                    <h4 class="font-semibold mb-2">Apps asociadas</h4>
-                    <div *ngIf="tenantAppsFiltered.length; else noAppsAsociadas">
-                      <ul>
-                        <li *ngFor="let app of tenantAppsFiltered" class="flex items-center justify-between py-2 border-b last:border-b-0">
-                          <span>{{ app.name }}</span>
-                          <button (click)="removeAppFromTenant(app)" class="text-red-600 hover:text-red-900 text-xs">Quitar</button>
-                        </li>
-                      </ul>
+                    <div class="p-6 flex-1 overflow-y-auto">
+                      <!-- Buscador -->
+                      <input type="text" [(ngModel)]="appsSearch" placeholder="Buscar apps..."
+                        class="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg" />
+                      <!-- Apps asociadas -->
+                      <h4 class="font-semibold mb-2">Apps asociadas</h4>
+                      <div *ngIf="tenantAppsFiltered.length; else noAppsAsociadas">
+                        <ul>
+                          <li *ngFor="let app of tenantAppsFiltered"
+                            class="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <span>{{ app.name }}</span>
+                            <div class="flex gap-2">
+                              <button *ngIf="canManageTenant(selectedTenant!)" (click)="openAccessModal(app)"
+                                class="text-blue-600 hover:text-blue-900 text-xs flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                Accesos
+                              </button>
+                              <button (click)="removeAppFromTenant(app)"
+                                class="text-red-600 hover:text-red-900 text-xs">Quitar</button>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                      <ng-template #noAppsAsociadas>
+                        <div class="text-gray-400 text-sm mb-4">No hay apps asociadas</div>
+                      </ng-template>
+                      <!-- Apps disponibles -->
+                      <h4 class="font-semibold mt-6 mb-2">Apps disponibles</h4>
+                      <div *ngIf="availableAppsFiltered.length; else noAppsDisponibles">
+                        <ul>
+                          <li *ngFor="let app of availableAppsFiltered"
+                            class="flex items-center justify-between py-2 border-b last:border-b-0">
+                            <span>{{ app.name }}</span>
+                            <button (click)="addAppToTenant(app)"
+                              class="text-green-600 hover:text-green-900 text-xs">Agregar</button>
+                          </li>
+                        </ul>
+                      </div>
+                      <ng-template #noAppsDisponibles>
+                        <div class="text-gray-400 text-sm">No hay apps disponibles para agregar</div>
+                      </ng-template>
                     </div>
-                    <ng-template #noAppsAsociadas>
-                      <div class="text-gray-400 text-sm mb-4">No hay apps asociadas</div>
-                    </ng-template>
-                    <!-- Apps disponibles -->
-                    <h4 class="font-semibold mt-6 mb-2">Apps disponibles</h4>
-                    <div *ngIf="availableAppsFiltered.length; else noAppsDisponibles">
-                      <ul>
-                        <li *ngFor="let app of availableAppsFiltered" class="flex items-center justify-between py-2 border-b last:border-b-0">
-                          <span>{{ app.name }}</span>
-                          <button (click)="addAppToTenant(app)" class="text-green-600 hover:text-green-900 text-xs">Agregar</button>
-                        </li>
-                      </ul>
+                    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                      <button (click)="closeAppsModal()"
+                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cerrar</button>
                     </div>
-                    <ng-template #noAppsDisponibles>
-                      <div class="text-gray-400 text-sm">No hay apps disponibles para agregar</div>
-                    </ng-template>
-                  </div>
-                  <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-                    <button (click)="closeAppsModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cerrar</button>
                   </div>
                 </div>
-              </div>
               </td>
             </tr>
             <tr *ngIf="tenants.length === 0">
@@ -169,8 +177,7 @@
 </div>
 
 <!-- Create Tenant Modal -->
-<div
-  *ngIf="showCreateModal"
+<div *ngIf="showCreateModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -181,11 +188,7 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-            <input
-              type="text"
-              [(ngModel)]="createForm.name"
-              name="name"
-              required
+            <input type="text" [(ngModel)]="createForm.name" name="name" required
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Ej: Empresa ABC" />
           </div>
@@ -193,11 +196,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">
               Slug (opcional)
             </label>
-            <input
-              type="text"
-              [(ngModel)]="createForm.slug"
-              name="slug"
-              pattern="[a-z0-9-]+"
+            <input type="text" [(ngModel)]="createForm.slug" name="slug" pattern="[a-z0-9-]+"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Ej: empresa-abc" />
             <p class="mt-1 text-xs text-gray-500">Solo letras minúsculas, números y guiones</p>
@@ -206,11 +205,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">
               Email del Admin *
             </label>
-            <input
-              type="email"
-              [(ngModel)]="createForm.tenantAdminEmail"
-              name="tenantAdminEmail"
-              required
+            <input type="email" [(ngModel)]="createForm.tenantAdminEmail" name="tenantAdminEmail" required
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="admin@empresa.com" />
             <p class="mt-1 text-xs text-gray-500">
@@ -222,15 +217,11 @@
           <p class="text-sm text-red-800">{{ error }}</p>
         </div>
         <div class="mt-6 flex gap-3 justify-end">
-          <button
-            type="button"
-            (click)="closeCreateModal()"
+          <button type="button" (click)="closeCreateModal()"
             class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
             Cancelar
           </button>
-          <button
-            type="submit"
-            [disabled]="loading"
+          <button type="submit" [disabled]="loading"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
             Crear Tenant
           </button>
@@ -241,8 +232,7 @@
 </div>
 
 <!-- Member Management Modal -->
-<div
-  *ngIf="showMemberModal"
+<div *ngIf="showMemberModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
     <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -250,9 +240,7 @@
         <h3 class="text-lg font-semibold text-gray-900">Miembros de {{ selectedTenant?.name }}</h3>
         <p class="text-sm text-gray-600 mt-1">{{ tenantMembers.length }} miembros</p>
       </div>
-      <button
-        *ngIf="canManageTenant(selectedTenant!)"
-        (click)="openInviteModal()"
+      <button *ngIf="canManageTenant(selectedTenant!)" (click)="openInviteModal()"
         class="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">
         Invitar Usuario
       </button>
@@ -264,8 +252,7 @@
       </div>
 
       <div *ngIf="!loadingMembers" class="space-y-2">
-        <div
-          *ngFor="let member of tenantMembers"
+        <div *ngFor="let member of tenantMembers"
           class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
           <div class="flex items-center gap-4">
             <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
@@ -286,14 +273,10 @@
               {{ getRoleLabel(member.role) }}
             </span>
             <div *ngIf="canManageTenant(selectedTenant!)" class="flex gap-2">
-              <button
-                (click)="openRoleModal(member)"
-                class="text-primary-600 hover:text-primary-900 text-sm">
+              <button (click)="openRoleModal(member)" class="text-primary-600 hover:text-primary-900 text-sm">
                 Cambiar Rol
               </button>
-              <button
-                (click)="openDeleteModal(member)"
-                class="text-red-600 hover:text-red-900 text-sm">
+              <button (click)="openDeleteModal(member)" class="text-red-600 hover:text-red-900 text-sm">
                 Eliminar
               </button>
             </div>
@@ -306,8 +289,7 @@
     </div>
 
     <div class="px-6 py-4 border-t border-gray-200">
-      <button
-        (click)="closeMemberModal()"
+      <button (click)="closeMemberModal()"
         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
         Cerrar
       </button>
@@ -316,8 +298,7 @@
 </div>
 
 <!-- Invite Member Modal -->
-<div
-  *ngIf="showInviteModal"
+<div *ngIf="showInviteModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -328,20 +309,13 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-            <input
-              type="email"
-              [(ngModel)]="inviteForm.email"
-              name="email"
-              required
+            <input type="email" [(ngModel)]="inviteForm.email" name="email" required
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="usuario@empresa.com" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Rol *</label>
-            <select
-              [(ngModel)]="inviteForm.role"
-              name="role"
-              required
+            <select [(ngModel)]="inviteForm.role" name="role" required
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
               <option [value]="TenantRole.ADMIN">Admin - Control total</option>
               <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
@@ -353,15 +327,11 @@
           <p class="text-sm text-red-800">{{ error }}</p>
         </div>
         <div class="mt-6 flex gap-3 justify-end">
-          <button
-            type="button"
-            (click)="closeInviteModal()"
+          <button type="button" (click)="closeInviteModal()"
             class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
             Cancelar
           </button>
-          <button
-            type="submit"
-            [disabled]="loadingMembers"
+          <button type="submit" [disabled]="loadingMembers"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
             Invitar
           </button>
@@ -372,8 +342,7 @@
 </div>
 
 <!-- Change Role Modal -->
-<div
-  *ngIf="showRoleModal"
+<div *ngIf="showRoleModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -386,10 +355,7 @@
             Cambiar rol de <strong>{{ selectedMember?.firstName }} {{ selectedMember?.lastName }}</strong>
           </p>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nuevo Rol *</label>
-          <select
-            [(ngModel)]="roleForm.role"
-            name="role"
-            required
+          <select [(ngModel)]="roleForm.role" name="role" required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
             <option [value]="TenantRole.ADMIN">Admin - Control total</option>
             <option [value]="TenantRole.MEMBER">Miembro - Acceso estándar</option>
@@ -400,15 +366,11 @@
           <p class="text-sm text-red-800">{{ error }}</p>
         </div>
         <div class="mt-6 flex gap-3 justify-end">
-          <button
-            type="button"
-            (click)="closeRoleModal()"
+          <button type="button" (click)="closeRoleModal()"
             class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
             Cancelar
           </button>
-          <button
-            type="submit"
-            [disabled]="loadingMembers"
+          <button type="submit" [disabled]="loadingMembers"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
             Actualizar
           </button>
@@ -419,8 +381,7 @@
 </div>
 
 <!-- Delete Member Modal -->
-<div
-  *ngIf="showDeleteModal"
+<div *ngIf="showDeleteModal"
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[60] flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
     <div class="px-6 py-4 border-b border-gray-200">
@@ -436,18 +397,92 @@
         <p class="text-sm text-red-800">{{ error }}</p>
       </div>
       <div class="mt-6 flex gap-3 justify-end">
-        <button
-          (click)="closeDeleteModal()"
+        <button (click)="closeDeleteModal()"
           class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
           Cancelar
         </button>
-        <button
-          (click)="removeMember()"
-          [disabled]="loadingMembers"
+        <button (click)="removeMember()" [disabled]="loadingMembers"
           class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
           Eliminar
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- User App Access Management Modal -->
+<div *ngIf="showAccessModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[80] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Gestionar Accesos: {{ selectedApp?.name }}</h3>
+        <p class="text-sm text-gray-600 mt-1">Selecciona los usuarios que tendrán acceso a esta aplicación</p>
+      </div>
+      <button (click)="closeAccessModal()" class="text-gray-500 hover:text-gray-800 text-2xl">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- Success/Error Messages -->
+      <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+        <p class="text-sm text-green-800">{{ success }}</p>
+      </div>
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+        <p class="text-sm text-red-800">{{ error }}</p>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loadingAccess || loadingMembers" class="flex justify-center items-center h-32">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+
+      <!-- Users list with toggle switches -->
+      <div *ngIf="!loadingAccess && !loadingMembers" class="space-y-2">
+        <div *ngFor="let member of tenantMembers"
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+          [class.bg-green-50]="userHasAccess(member.userId)" [class.border-green-300]="userHasAccess(member.userId)">
+
+          <div class="flex items-center gap-4">
+            <div
+              class="h-10 w-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+              <span class="text-white font-semibold text-sm">
+                {{ member.firstName.charAt(0) }}{{ member.lastName.charAt(0) }}
+              </span>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-gray-900">
+                {{ member.firstName }} {{ member.lastName }}
+              </div>
+              <div class="text-sm text-gray-500">{{ member.email }}</div>
+            </div>
+          </div>
+
+          <!-- Toggle Switch -->
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" [checked]="userHasAccess(member.userId)" (change)="toggleUserAccess(member.userId)"
+              class="sr-only peer" />
+            <div
+              class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600">
+            </div>
+          </label>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="tenantMembers.length === 0" class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <p class="mt-2">No hay miembros en este tenant</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+      <button (click)="closeAccessModal()"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+        Cerrar
+      </button>
     </div>
   </div>
 </div>

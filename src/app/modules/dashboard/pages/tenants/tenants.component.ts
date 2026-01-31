@@ -13,6 +13,7 @@ import { ApplicationManagementService } from 'src/app/core/services/application-
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { TenantAppService } from 'src/app/core/services/tenant-app.service';
 import { TenantManagementService } from 'src/app/core/services/tenant-management.service';
+import { UserAppAccessService } from 'src/app/core/services/user-app-access.service';
 
 @Component({
   selector: 'app-tenants',
@@ -37,6 +38,7 @@ export class TenantsComponent implements OnInit {
   showInviteModal = false;
   showRoleModal = false;
   showDeleteModal = false;
+  showAccessModal = false;
   selectedMember: TenantMember | null = null;
 
   // Form data
@@ -65,7 +67,8 @@ export class TenantsComponent implements OnInit {
     private router: Router,
     private applicationService: ApplicationManagementService,
     private tenantAppService: TenantAppService,
-  ) {}
+    private userAppAccessService: UserAppAccessService,
+  ) { }
 
   async ngOnInit() {
     await this.loadUserProfile();
@@ -221,6 +224,113 @@ export class TenantsComponent implements OnInit {
         next: () => this.loadTenantAppsAndAvailable(),
       });
   }
+
+  // User App Access Management
+  selectedApp: Application | null = null;
+  usersWithAccess: Set<string> = new Set();
+  loadingAccess = false;
+
+  /**
+   * Open modal to manage user access to an app
+   */
+  openAccessModal(app: Application) {
+    if (!this.selectedTenant) return;
+
+    this.selectedApp = app;
+    this.showAccessModal = true;
+    this.error = null;
+    this.success = null;
+
+    // Load members if not already loaded
+    if (this.tenantMembers.length === 0) {
+      this.loadTenantMembers(this.selectedTenant.id);
+    }
+
+    // Load users with access
+    this.loadUsersWithAccess();
+  }
+
+  /**
+   * Close access management modal
+   */
+  closeAccessModal() {
+    this.showAccessModal = false;
+    this.selectedApp = null;
+    this.usersWithAccess.clear();
+  }
+
+  /**
+   * Load users who have access to the selected app
+   */
+  loadUsersWithAccess() {
+    if (!this.selectedTenant || !this.selectedApp) return;
+
+    this.loadingAccess = true;
+    this.userAppAccessService
+      .getUsersWithAppAccess(this.selectedTenant.id, this.selectedApp.id)
+      .subscribe({
+        next: (response) => {
+          this.usersWithAccess = new Set(response.users.map((u) => u.userId));
+          this.loadingAccess = false;
+        },
+        error: (err) => {
+          console.error('Error loading access:', err);
+          this.error = err.error?.message || 'Error al cargar accesos';
+          this.loadingAccess = false;
+        },
+      });
+  }
+
+  /**
+   * Toggle user access to the app
+   */
+  toggleUserAccess(userId: string) {
+    if (!this.selectedTenant || !this.selectedApp) return;
+
+    const hasAccess = this.usersWithAccess.has(userId);
+
+    if (hasAccess) {
+      // Revoke access
+      this.userAppAccessService
+        .revokeAppAccess(this.selectedTenant.id, this.selectedApp.id, userId)
+        .subscribe({
+          next: () => {
+            this.usersWithAccess.delete(userId);
+            this.success = 'Acceso revocado exitosamente';
+            setTimeout(() => (this.success = null), 3000);
+          },
+          error: (err) => {
+            console.error('Error revoking access:', err);
+            this.error = err.error?.message || 'Error al revocar acceso';
+            setTimeout(() => (this.error = null), 3000);
+          },
+        });
+    } else {
+      // Grant access
+      this.userAppAccessService
+        .grantAppAccess(this.selectedTenant.id, this.selectedApp.id, userId)
+        .subscribe({
+          next: () => {
+            this.usersWithAccess.add(userId);
+            this.success = 'Acceso otorgado exitosamente';
+            setTimeout(() => (this.success = null), 3000);
+          },
+          error: (err) => {
+            console.error('Error granting access:', err);
+            this.error = err.error?.message || 'Error al otorgar acceso';
+            setTimeout(() => (this.error = null), 3000);
+          },
+        });
+    }
+  }
+
+  /**
+   * Check if a user has access to the selected app
+   */
+  userHasAccess(userId: string): boolean {
+    return this.usersWithAccess.has(userId);
+  }
+
 
   closeCreateModal() {
     this.showCreateModal = false;
