@@ -94,6 +94,12 @@
                 <a [routerLink]="['/dashboard/roles', tenant.id]" class="text-blue-600 hover:text-blue-900 mr-3">
                   Gestionar Roles
                 </a>
+                <!-- Tenant Admin: Manage user access to apps -->
+                <button *ngIf="canManageTenant(tenant)" (click)="openTenantAccessModal(tenant)"
+                  class="text-purple-600 hover:text-purple-900 mr-3">
+                  Gestionar Accesos
+                </button>
+                <!-- System Admin: Manage apps assigned to tenant -->
                 <button *ngIf="canManageApps(tenant)" (click)="openAppsModal(tenant)"
                   class="text-green-600 hover:text-green-900">
                   Gestionar Apps
@@ -478,8 +484,94 @@
       </div>
     </div>
 
-    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-between">
+      <!-- Back button when opened from Tenant Admin view -->
+      <button *ngIf="showTenantAccessModal" (click)="closeAccessModalToTenantView()"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Volver a Apps
+      </button>
+      <div *ngIf="!showTenantAccessModal"></div>
+
       <button (click)="closeAccessModal()"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Tenant Admin: Access Management Modal -->
+<div *ngIf="showTenantAccessModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[70] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Gestionar Accesos: {{ selectedTenant?.name }}</h3>
+        <p class="text-sm text-gray-600 mt-1">Administra qué usuarios tienen acceso a cada aplicación</p>
+      </div>
+      <button (click)="closeTenantAccessModal()" class="text-gray-500 hover:text-gray-800 text-2xl">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- Success/Error Messages -->
+      <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+        <p class="text-sm text-green-800">{{ success }}</p>
+      </div>
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+        <p class="text-sm text-red-800">{{ error }}</p>
+      </div>
+
+      <!-- Loading state -->
+      <div *ngIf="loadingTenantApps" class="flex justify-center items-center h-32">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+      </div>
+
+      <!-- Apps list -->
+      <div *ngIf="!loadingTenantApps" class="space-y-3">
+        <div *ngFor="let app of tenantAccessApps"
+          class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+
+          <div class="flex items-center gap-4">
+            <div
+              class="h-12 w-12 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-gray-900">{{ app.name }}</div>
+              <div class="text-xs text-gray-500">{{ app.description || 'Sin descripción' }}</div>
+            </div>
+          </div>
+
+          <button (click)="openAccessModalFromTenantView(app)"
+            class="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            Gestionar Usuarios
+          </button>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="tenantAccessApps.length === 0" class="text-center py-12 text-gray-500">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="mt-2 font-medium">No hay aplicaciones asignadas a este tenant</p>
+          <p class="text-sm mt-1">Contacta a un System Admin para agregar aplicaciones</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+      <button (click)="closeTenantAccessModal()"
         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
         Cerrar
       </button>

@@ -225,6 +225,80 @@ export class TenantsComponent implements OnInit {
       });
   }
 
+  // Tenant Admin Access Management (separate from System Admin Apps Management)
+  showTenantAccessModal = false;
+  tenantAccessApps: Application[] = [];
+  loadingTenantApps = false;
+
+  /**
+   * Open access management modal for Tenant Admins
+   * Shows apps of the tenant and allows managing user access
+   */
+  openTenantAccessModal(tenant: Tenant) {
+    this.selectedTenant = tenant;
+    this.showTenantAccessModal = true;
+    this.error = null;
+    this.success = null;
+
+    // Load members if not already loaded
+    if (this.tenantMembers.length === 0) {
+      this.loadTenantMembers(tenant.id);
+    }
+
+    // Load tenant apps
+    this.loadTenantAccessApps();
+  }
+
+  /**
+   * Close tenant access management modal
+   */
+  closeTenantAccessModal() {
+    this.showTenantAccessModal = false;
+    this.selectedTenant = null;
+    this.tenantAccessApps = [];
+    this.selectedApp = null;
+    this.usersWithAccess.clear();
+  }
+
+  /**
+   * Load apps for the tenant (for Tenant Admin view)
+   */
+  loadTenantAccessApps() {
+    if (!this.selectedTenant) return;
+
+    this.loadingTenantApps = true;
+    this.tenantAppService.getTenantApps(this.selectedTenant.id).subscribe({
+      next: (res) => {
+        this.tenantAccessApps = res.applications;
+        this.loadingTenantApps = false;
+      },
+      error: (err) => {
+        console.error('Error loading tenant apps:', err);
+        this.error = err.error?.message || 'Error al cargar aplicaciones';
+        this.loadingTenantApps = false;
+      },
+    });
+  }
+
+  /**
+   * Open access modal for a specific app (from Tenant Admin view)
+   */
+  openAccessModalFromTenantView(app: Application) {
+    this.selectedApp = app;
+    this.showAccessModal = true;
+    this.loadUsersWithAccess();
+  }
+
+  /**
+   * Close access modal and return to tenant apps list
+   */
+  closeAccessModalToTenantView() {
+    this.showAccessModal = false;
+    this.selectedApp = null;
+    this.usersWithAccess.clear();
+  }
+
+
   // User App Access Management
   selectedApp: Application | null = null;
   usersWithAccess: Set<string> = new Set();
