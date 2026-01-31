@@ -40,13 +40,6 @@ const routes: Routes = [
       ),
   },
   {
-    path: 'home',
-    loadChildren: () =>
-      import('./modules/unlogged-layout/unlogged-layout.module').then(
-        (m) => m.UnloggedLayoutModule,
-      ),
-  },
-  {
     path: 'auth',
     loadChildren: () =>
       import('./modules/auth/auth.module').then((m) => m.AuthModule),
@@ -62,6 +55,14 @@ const routes: Routes = [
     // canActivate: [isLoggedGuard],
     loadChildren: () =>
       import('./modules/profile/profile.module').then((m) => m.ProfileModule),
+  },
+  {
+    path: 'home',
+    // canActivate: [isLoggedGuard],
+    loadChildren: () =>
+      import('./modules/dashboard-old/dashboard.module').then(
+        (m) => m.DashboardModule,
+      ),
   },
   {
     path: 'errors',
