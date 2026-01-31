@@ -28,6 +28,11 @@ export class Menu {
           ],
         },
         {
+          icon: 'assets/icons/heroicons/outline/user.svg',
+          label: 'Perfil',
+          route: '/profile',
+        },
+        {
           hidden: true,
           icon: 'assets/icons/heroicons/outline/lock-closed.svg',
           label: 'Auth',
@@ -103,6 +108,11 @@ export class Menu {
           label: 'Tenants',
           icon: 'assets/icons/heroicons/outline/office-building.svg',
           route: '/admin/tenants',
+        },
+        {
+          label: 'Roles',
+          icon: 'assets/icons/heroicons/outline/user-group.svg',
+          route: '/admin/roles',
         },
       ],
     },
