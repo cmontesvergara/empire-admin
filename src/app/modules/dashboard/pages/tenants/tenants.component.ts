@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -16,15 +16,24 @@ import { RoleManagementService } from 'src/app/core/services/role-management.ser
 import { TenantAppService } from 'src/app/core/services/tenant-app.service';
 import { TenantManagementService } from 'src/app/core/services/tenant-management.service';
 import { UserAppAccessService } from 'src/app/core/services/user-app-access.service';
+import { GenericTableComponent } from 'src/app/shared/components/generic-table/generic-table.component';
+import { TableColumn } from 'src/app/shared/components/generic-table/models/table-column.model';
 
 @Component({
   selector: 'app-tenants',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, GenericTableComponent],
   templateUrl: './tenants.component.html',
   styleUrl: './tenants.component.scss',
 })
 export class TenantsComponent implements OnInit {
+  // Templates
+  @ViewChild('tenantTemplate') tenantTemplate!: TemplateRef<any>;
+  @ViewChild('slugTemplate') slugTemplate!: TemplateRef<any>;
+  @ViewChild('roleTemplate') roleTemplate!: TemplateRef<any>;
+  @ViewChild('actionsTemplate') actionsTemplate!: TemplateRef<any>;
+
+  tableColumns: TableColumn[] = [];
   tenants: Tenant[] = [];
   selectedTenant: Tenant | null = null;
   tenantMembers: TenantMember[] = [];
@@ -80,6 +89,15 @@ export class TenantsComponent implements OnInit {
   async ngOnInit() {
     await this.loadUserProfile();
     await this.loadTenants();
+
+    this.tableColumns = [
+      { header: 'Tenant', field: 'name', template: this.tenantTemplate },
+      { header: 'Slug', field: 'slug', template: this.slugTemplate },
+      { header: 'Tu Rol', field: 'role', template: this.roleTemplate },
+      { header: 'Miembros', field: 'memberCount' },
+      { header: 'Creado', field: 'createdAt', type: 'date' },
+      { header: 'Acciones', field: 'actions', template: this.actionsTemplate, sortable: false }
+    ];
   }
 
   async loadUserProfile() {
