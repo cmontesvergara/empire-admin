@@ -1,3 +1,4 @@
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { SystemRole } from 'src/app/core/models';
@@ -10,6 +11,7 @@ import {
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [CommonModule, NgIf, NgFor],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
@@ -19,7 +21,7 @@ export class HomeComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) { }
 
   async ngOnInit() {
     try {

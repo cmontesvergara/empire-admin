@@ -15,7 +15,7 @@
 
     <!-- Tenants List -->
     <div *ngIf="!loading && !error">
-      <app-generic-table [data]="tenants" [columns]="tableColumns" [loading]="loading" title="Listado de Tenants"
+      <app-generic-table [data]="tenants" [columns]="tableColumns" [loading]="loading" title="Listado de Organizaciones"
         subtitle="Organizaciones registradas" [headerActions]="headerButtons">
       </app-generic-table>
     </div>
@@ -29,7 +29,7 @@
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
     </svg>
-    Nuevo Tenant
+    Nueva Organización
   </button>
 </ng-template>
 

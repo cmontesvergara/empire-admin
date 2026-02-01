@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -8,6 +9,7 @@ import {
 @Component({
   selector: 'app-tenant-selector',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './tenant-selector.component.html',
   styleUrls: ['./tenant-selector.component.scss'],
 })
@@ -22,7 +24,7 @@ export class TenantSelectorComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Get query params
