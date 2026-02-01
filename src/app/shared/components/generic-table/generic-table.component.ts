@@ -33,6 +33,29 @@ export class GenericTableComponent implements OnInit, OnChanges {
     // Page size options
     pageSizeOptions = [5, 10, 20, 30, 50];
 
+    // Action Menu State
+    openActionMenuId: any | null = null;
+
+    toggleActionMenu(row: any, event: Event) {
+        event.stopPropagation();
+        const id = row.id || row.userId || row.appId; // Fallback for ID
+        if (this.openActionMenuId === id) {
+            this.openActionMenuId = null;
+        } else {
+            this.openActionMenuId = id;
+        }
+    }
+
+    closeActionMenu() {
+        this.openActionMenuId = null;
+    }
+
+    // Helper to check if row has open menu
+    isMenuOpen(row: any): boolean {
+        const id = row.id || row.userId || row.appId;
+        return this.openActionMenuId === id;
+    }
+
     constructor() { }
 
     ngOnInit() {

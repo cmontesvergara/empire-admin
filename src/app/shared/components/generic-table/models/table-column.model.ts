@@ -6,5 +6,5 @@ export interface TableColumn {
     template?: TemplateRef<any>;
     width?: string;
     sortable?: boolean;
-    type?: 'text' | 'date' | 'badge' | 'custom';
+    type?: 'text' | 'date' | 'badge' | 'custom' | 'actions';
 }

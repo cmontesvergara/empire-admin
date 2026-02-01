@@ -52,6 +52,8 @@ export class TenantsComponent implements OnInit {
   showAccessModal = false;
   selectedMember: TenantMember | null = null;
 
+
+
   // Form data
   createForm = {
     name: '',
@@ -96,7 +98,7 @@ export class TenantsComponent implements OnInit {
       { header: 'Tu Rol', field: 'role', template: this.roleTemplate },
       { header: 'Miembros', field: 'memberCount' },
       { header: 'Creado', field: 'createdAt', type: 'date' },
-      { header: 'Acciones', field: 'actions', template: this.actionsTemplate, sortable: false }
+      { header: 'Acciones', field: 'actions', template: this.actionsTemplate, sortable: false, type: 'actions' }
     ];
   }
 
