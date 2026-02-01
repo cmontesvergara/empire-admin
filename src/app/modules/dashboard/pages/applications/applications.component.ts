@@ -1,15 +1,23 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 import { Application, SystemRole, UserProfile } from 'src/app/core/models';
 import { ApplicationManagementService } from 'src/app/core/services/application-management.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { GenericTableComponent } from 'src/app/shared/components/generic-table/generic-table.component';
+import { TableColumn } from 'src/app/shared/components/generic-table/models/table-column.model';
 
 @Component({
   selector: 'app-applications',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AngularSvgIconModule,
+    GenericTableComponent
+  ],
   templateUrl: './applications.component.html',
   styleUrl: './applications.component.scss',
 })
@@ -18,6 +26,15 @@ export class ApplicationsComponent implements OnInit {
   loading = true;
   error: string | null = null;
   user: UserProfile | null = null;
+
+  tableColumns: TableColumn[] = [];
+
+  // Templates
+  @ViewChild('appTemplate', { static: true }) appTemplate!: TemplateRef<any>;
+  @ViewChild('urlTemplate', { static: true }) urlTemplate!: TemplateRef<any>;
+  @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<any>;
+  @ViewChild('dateTemplate', { static: true }) dateTemplate!: TemplateRef<any>;
+  @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
 
   // Form state
   showCreateModal = false;
@@ -38,11 +55,23 @@ export class ApplicationsComponent implements OnInit {
     private appManagementService: ApplicationManagementService,
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) { }
 
   async ngOnInit() {
     await this.loadUserProfile();
+    this.initColumns(); // Initialize columns AFTER view init would be safer if using static: false, but static: true is ok here
     await this.loadApplications();
+  }
+
+  initColumns() {
+    this.tableColumns = [
+      { header: 'APLICACIÓN', field: 'name', template: this.appTemplate, width: '30%' },
+      { header: 'APP ID', field: 'appId', width: '15%' },
+      { header: 'URL', field: 'url', template: this.urlTemplate, width: '20%' },
+      { header: 'ESTADO', field: 'isActive', template: this.statusTemplate, width: '10%' },
+      { header: 'CREADA', field: 'createdAt', template: this.dateTemplate, width: '10%' },
+      { header: 'ACCIONES', template: this.actionsTemplate, width: '15%' },
+    ];
   }
 
   async loadUserProfile() {
@@ -136,7 +165,7 @@ export class ApplicationsComponent implements OnInit {
         console.error('Error creating application:', err);
         alert(
           'Error al crear aplicación: ' +
-            (err.error?.message || 'Error desconocido'),
+          (err.error?.message || 'Error desconocido'),
         );
       },
     });
@@ -158,7 +187,7 @@ export class ApplicationsComponent implements OnInit {
           console.error('Error updating application:', err);
           alert(
             'Error al actualizar aplicación: ' +
-              (err.error?.message || 'Error desconocido'),
+            (err.error?.message || 'Error desconocido'),
           );
         },
       });
@@ -176,7 +205,7 @@ export class ApplicationsComponent implements OnInit {
         console.error('Error deleting application:', err);
         alert(
           'Error al eliminar aplicación: ' +
-            (err.error?.message || 'Error desconocido'),
+          (err.error?.message || 'Error desconocido'),
         );
       },
     });

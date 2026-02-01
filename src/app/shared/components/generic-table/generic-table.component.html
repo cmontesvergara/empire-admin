@@ -1,0 +1,47 @@
+<div class="flex min-w-full flex-col rounded-xl border border-muted/20 bg-background p-2">
+    <div
+        class="scrollbar-thumb-rounded scrollbar-track-rounded grow overflow-x-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted">
+        <table
+            class="table w-full table-auto border-collapse border-0 text-left align-middle leading-5 text-muted-foreground">
+            <thead class="border border-muted/20 text-xs text-muted-foreground">
+                <tr>
+                    <th *ngFor="let col of columns" [style.width]="col.width" class="whitespace-nowrap">
+                        {{ col.header }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loading State -->
+                <tr *ngIf="loading">
+                    <td [attr.colspan]="columns.length" class="py-8 text-center text-sm">
+                        <div class="flex justify-center items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- Data Rows -->
+                <ng-container *ngIf="!loading">
+                    <tr *ngFor="let row of data" class="hover:bg-card/50 transition-colors">
+                        <td *ngFor="let col of columns">
+                            <ng-container *ngIf="col.template; else defaultCell">
+                                <ng-container *ngTemplateOutlet="col.template; context: { $implicit: row }">
+                                </ng-container>
+                            </ng-container>
+                            <ng-template #defaultCell>
+                                {{ col.field ? row[col.field] : '-' }}
+                            </ng-template>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="data.length === 0">
+                        <td [attr.colspan]="columns.length" class="py-8 text-center text-sm">
+                            No se encontraron registros
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>
