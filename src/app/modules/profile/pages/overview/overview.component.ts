@@ -6,7 +6,7 @@ import {
   TenantWithApps,
 } from 'src/app/core/services/auth/auth.service';
 import { LoadingService } from 'src/app/core/services/loading/loading.service';
-import { UserService } from 'src/app/core/services/user/user.service';
+
 import { ProfileHeaderComponent } from '../../components/profile/profile-header/profile-header.component';
 import { ProfilePersonalInformationComponent } from '../../components/profile/profile-personal-information/profile-personal-information.component';
 import { ProfileSecurityComponent } from '../../components/profile/profile-security/profile-security.component';
@@ -22,7 +22,7 @@ import { UserBasicInformation } from '../../models/user-basic-information';
     ProfileSecurityComponent,
     CommonModule,
   ],
-  providers: [UserService],
+  providers: [],
 })
 export class OverviewComponent implements OnInit {
   userBasicInformation: UserBasicInformation = <UserBasicInformation>{};
@@ -31,7 +31,6 @@ export class OverviewComponent implements OnInit {
   loadingTenants = true;
 
   constructor(
-    private readonly userService: UserService,
     private loadingService: LoadingService,
     private authService: AuthService,
     private router: Router,
@@ -70,13 +69,13 @@ export class OverviewComponent implements OnInit {
               user.userStatus === 'active' ? 'verified' : 'unverified',
             addresses: firstAddress
               ? [
-                  {
-                    street: firstAddress.detail || '',
-                    country: firstAddress.country || '',
-                    state: firstAddress.province || '',
-                    city: firstAddress.city || '',
-                  },
-                ]
+                {
+                  street: firstAddress.detail || '',
+                  country: firstAddress.country || '',
+                  state: firstAddress.province || '',
+                  city: firstAddress.city || '',
+                },
+              ]
               : [],
           };
         }

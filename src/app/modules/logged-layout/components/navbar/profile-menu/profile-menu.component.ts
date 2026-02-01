@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AvatarModule } from 'ngx-avatars';
-import { UserService } from 'src/app/core/services/user/user.service';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
 import { ThemeService } from '../../../../../core/services/theme/theme.service';
 import { ClickOutsideDirective } from '../../../../../shared/directives/click-outside.directive';
 
@@ -106,20 +106,19 @@ export class ProfileMenuComponent implements OnInit {
 
   constructor(
     public themeService: ThemeService,
-    private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {
-    this.userService.getUserInformation().subscribe((res: any) => {
-      this.userInformation = {
-        name:
-          res.basic_information.first_name +
-          ' ' +
-          res.basic_information.last_name,
-        email: res.basic_information.email,
-      };
+    this.authService.getProfile().subscribe((res) => {
+      if (res && res.user) {
+        this.userInformation = {
+          name: `${res.user.firstName} ${res.user.lastName}`,
+          email: res.user.email,
+        };
+      }
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   public toggleMenu(): void {
     this.isOpen = !this.isOpen;
