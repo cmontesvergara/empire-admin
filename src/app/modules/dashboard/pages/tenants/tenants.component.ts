@@ -93,7 +93,7 @@ export class TenantsComponent implements OnInit {
     await this.loadTenants();
 
     this.tableColumns = [
-      { header: 'Tenant', field: 'name', template: this.tenantTemplate },
+      { header: 'Organización', field: 'name', template: this.tenantTemplate },
       { header: 'Slug', field: 'slug', template: this.slugTemplate },
       { header: 'Tu Rol', field: 'role', template: this.roleTemplate },
       { header: 'Miembros', field: 'memberCount' },

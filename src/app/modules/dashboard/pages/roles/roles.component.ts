@@ -77,14 +77,14 @@ export class RolesComponent implements OnInit {
     private applicationManagementService: ApplicationManagementService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {}
+  ) { }
 
   async ngOnInit() {
     // Get tenant ID from route
     this.tenantId = this.route.snapshot.params['tenantId'];
 
     if (!this.tenantId) {
-      this.error = 'No se especificó un tenant';
+      this.error = 'No se especificó una organización';
       this.loading = false;
       return;
     }
@@ -113,12 +113,12 @@ export class RolesComponent implements OnInit {
         if (userTenant) {
           this.tenant = userTenant;
         } else {
-          this.error = 'No tienes acceso a este tenant';
+          this.error = 'No tienes acceso a esta organización';
         }
       },
       error: (err) => {
         console.error('Error loading tenant:', err);
-        this.error = err.error?.message || 'Error al cargar el tenant';
+        this.error = err.error?.message || 'Error al cargar la organización';
       },
     });
   }

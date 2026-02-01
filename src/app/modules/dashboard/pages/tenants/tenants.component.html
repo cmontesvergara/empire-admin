@@ -91,7 +91,7 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
     </svg>
-    Gestionar Apps Tenant
+    Gestionar Apps Organización
   </button>
 </ng-template>
 
@@ -100,7 +100,7 @@
   class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
   <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
     <div class="px-6 py-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-gray-900">Crear Nuevo Tenant</h3>
+      <h3 class="text-lg font-semibold text-gray-900">Crear Nueva Organización</h3>
     </div>
     <div class="p-6">
       <form (ngSubmit)="createTenant()">
@@ -142,7 +142,7 @@
           </button>
           <button type="submit" [disabled]="loading"
             class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50">
-            Crear Tenant
+            Crear Organización
           </button>
         </div>
       </form>
@@ -202,7 +202,7 @@
           </div>
         </div>
         <div *ngIf="tenantMembers.length === 0" class="text-center py-8 text-gray-500">
-          No hay miembros en este tenant
+          No hay miembros en esta organización
         </div>
       </div>
     </div>
@@ -319,7 +319,7 @@
     <div class="p-6">
       <p class="text-gray-700">
         ¿Estás seguro de que deseas eliminar a
-        <strong>{{ selectedMember?.firstName }} {{ selectedMember?.lastName }}</strong> de este tenant?
+        <strong>{{ selectedMember?.firstName }} {{ selectedMember?.lastName }}</strong> de esta organización?
       </p>
       <p class="text-sm text-gray-500 mt-2">Esta acción no se puede deshacer.</p>
       <div *ngIf="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -402,7 +402,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <p class="mt-2">No hay miembros en este tenant</p>
+          <p class="mt-2">No hay miembros en esta organización</p>
         </div>
       </div>
     </div>
@@ -487,7 +487,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p class="mt-2 font-medium">No hay aplicaciones asignadas a este tenant</p>
+          <p class="mt-2 font-medium">No hay aplicaciones asignadas a esta organización</p>
           <p class="text-sm mt-1">Contacta a un System Admin para agregar aplicaciones</p>
         </div>
       </div>
@@ -498,6 +498,82 @@
         class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
         Cerrar
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- Apps Management Modal (System Admin) -->
+<div *ngIf="showAppsModal"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-[70] flex items-center justify-center">
+  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Gestionar Apps de {{ selectedTenant?.name }}</h3>
+        <p class="text-sm text-gray-600 mt-1">Agrega o quita aplicaciones asociadas a esta organización</p>
+      </div>
+      <button (click)="closeAppsModal()" class="text-gray-500 hover:text-gray-800">✕</button>
+    </div>
+    <div class="p-6 flex-1 overflow-y-auto">
+      <!-- Buscador -->
+      <input type="text" [(ngModel)]="appsSearch" placeholder="Buscar apps..."
+        class="w-full mb-4 px-3 py-2 border border-gray-300 rounded-lg" />
+
+      <!-- Apps asociadas -->
+      <h4 class="font-semibold mb-2">Apps asociadas</h4>
+      <div *ngIf="tenantAppsFiltered.length; else noAppsAsociadas">
+        <ul>
+          <li *ngFor="let app of tenantAppsFiltered"
+            class="flex items-center justify-between py-2 border-b last:border-b-0">
+            <span>{{ app.name }}</span>
+            <div class="flex gap-2">
+              <button *ngIf="canManageTenant(selectedTenant!)" (click)="openAccessModal(app)"
+                class="text-blue-600 hover:text-blue-900 text-xs flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Accesos
+              </button>
+              <button (click)="removeAppFromTenant(app)"
+                class="text-red-600 hover:text-red-900 text-xs flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Quitar
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <ng-template #noAppsAsociadas>
+        <div class="text-gray-400 text-sm mb-4">No hay apps asociadas</div>
+      </ng-template>
+
+      <!-- Apps disponibles -->
+      <h4 class="font-semibold mt-6 mb-2">Apps disponibles</h4>
+      <div *ngIf="availableAppsFiltered.length; else noAppsDisponibles">
+        <ul>
+          <li *ngFor="let app of availableAppsFiltered"
+            class="flex items-center justify-between py-2 border-b last:border-b-0">
+            <span>{{ app.name }}</span>
+            <button (click)="addAppToTenant(app)"
+              class="text-green-600 hover:text-green-900 text-xs flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Agregar
+            </button>
+          </li>
+        </ul>
+      </div>
+      <ng-template #noAppsDisponibles>
+        <div class="text-gray-400 text-sm">No hay apps disponibles para agregar</div>
+      </ng-template>
+    </div>
+    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+      <button (click)="closeAppsModal()"
+        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cerrar</button>
     </div>
   </div>
 </div>

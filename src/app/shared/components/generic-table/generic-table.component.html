@@ -53,7 +53,8 @@
 
                 <!-- Data Rows -->
                 <ng-container *ngIf="!loading">
-                    <tr *ngFor="let row of paginatedData" class="hover:bg-card/50 transition-colors">
+                    <tr *ngFor="let row of paginatedData; let i = index; let last = last"
+                        class="hover:bg-card/50 transition-colors">
                         <td *ngFor="let col of columns">
                             <ng-container [ngSwitch]="col.type">
                                 <!-- Actions Column Type -->
@@ -69,7 +70,8 @@
 
                                         <!-- Dropdown Menu -->
                                         <div *ngIf="isMenuOpen(row)"
-                                            class="absolute right-0 mt-8 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 origin-top-right">
+                                            class="absolute right-0 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+                                            [ngClass]="(paginatedData.length > 3 && i >= paginatedData.length - 2) ? 'bottom-full mb-1 origin-bottom-right' : 'mt-8 origin-top-right'">
                                             <div class="py-1" role="menu" aria-orientation="vertical">
                                                 <!-- Content provided by template -->
                                                 <ng-container

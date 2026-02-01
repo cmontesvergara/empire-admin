@@ -105,7 +105,7 @@ export class Menu {
           route: '/dashboard/applications',
         },
         {
-          label: 'Tenants',
+          label: 'Organizaciones',
           icon: 'assets/icons/heroicons/outline/office-building.svg',
           route: '/dashboard/tenants',
         },
