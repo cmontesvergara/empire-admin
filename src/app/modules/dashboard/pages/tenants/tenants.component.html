@@ -8,8 +8,8 @@
           <p class="text-gray-600 mt-1">Administra los tenants y sus miembros</p>
         </div>
         <button *ngIf="canCreateTenant()" (click)="openCreateModal()"
-          class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition flex items-center gap-2">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
           Nuevo Tenant
@@ -228,7 +228,7 @@
             Cancelar
           </button>
           <button type="submit" [disabled]="loading"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50">
             Crear Tenant
           </button>
         </div>
@@ -247,7 +247,7 @@
         <p class="text-sm text-gray-600 mt-1">{{ tenantMembers.length }} miembros</p>
       </div>
       <button *ngIf="canManageTenant(selectedTenant!)" (click)="openInviteModal()"
-        class="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700">
+        class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition">
         Invitar Usuario
       </button>
     </div>
@@ -338,7 +338,7 @@
             Cancelar
           </button>
           <button type="submit" [disabled]="loadingMembers"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50">
             Invitar
           </button>
         </div>
@@ -387,7 +387,7 @@
             Cancelar
           </button>
           <button type="submit" [disabled]="loadingMembers"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+            class="flex-none rounded-md bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition disabled:opacity-50">
             Actualizar
           </button>
         </div>
