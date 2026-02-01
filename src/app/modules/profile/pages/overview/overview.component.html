@@ -1,6 +1,6 @@
 <section class="">
 
-  <div  class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Profile Header with Stats -->
     <app-profile-header [user]="userBasicInformation" />
 
@@ -10,11 +10,11 @@
 
       <!-- Enhanced Security Card -->
 
-        <app-profile-security/>
+      <app-profile-security />
 
       <!-- personal information -->
 
-        <app-profile-personal-information [user]="userBasicInformation"/>
+      <app-profile-personal-information [user]="userBasicInformation" />
 
 
 
@@ -28,8 +28,7 @@
               Servicios Conectados ({{ totalApps }})
             </h2>
             <div class="flex space-x-4">
-              <button
-                (click)="viewAllApps()"
+              <button (click)="viewAllApps()"
                 class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
                 Ver Todo
               </button>
@@ -50,23 +49,36 @@
           <div *ngIf="!loadingTenants && tenants.length > 0">
             <div *ngFor="let tenant of tenants" class="mb-8 last:mb-0">
               <!-- Tenant Header -->
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                  {{ tenant.name }}
-                </h3>
-                <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
-                  {{ tenant.slug }}
-                </span>
+              <!-- Tenant Header -->
+              <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                <!-- Avatar -->
+                <div
+                  class="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20 flex items-center justify-center shrink-0">
+                  <span class="text-white text-xl font-bold">{{ tenant.name.charAt(0).toUpperCase() }}</span>
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-3">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">
+                      {{ tenant.name }}
+                    </h3>
+                    <span
+                      class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                      {{ tenant.slug }}
+                    </span>
+                  </div>
+                  <p class="text-sm font-medium text-blue-600 dark:text-blue-400">Organización</p>
+                </div>
               </div>
 
               <!-- Apps Grid -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div
-                  *ngFor="let app of tenant.apps"
-                  (click)="launchApp(tenant.tenantId, app.appId, app.url)"
+                <div *ngFor="let app of tenant.apps" (click)="launchApp(tenant.tenantId, app.appId, app.url)"
                   class="p-4 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600">
                   <div class="flex items-start mb-3">
-                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 mr-3">
+                    <div
+                      class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 mr-3">
                       <span class="text-white text-lg font-bold">{{ app.name.charAt(0).toUpperCase() }}</span>
                     </div>
                     <div class="flex-1 min-w-0">
