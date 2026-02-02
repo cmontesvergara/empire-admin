@@ -38,7 +38,7 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    canActivate: [isLoggedGuard],
+    canActivateChild: [isLoggedGuard],
     loadChildren: () =>
       import('./modules/logged-layout/logged-layout.module').then(
         (m) => m.LoggedLayoutModule,
