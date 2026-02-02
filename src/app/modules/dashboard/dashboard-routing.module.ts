@@ -8,6 +8,7 @@ import { NftComponent } from './pages/nft/nft.component';
 import { RolesComponent } from './pages/roles/roles.component';
 import { TenantSelectorComponent } from './pages/tenant-selector/tenant-selector.component';
 import { TenantsComponent } from './pages/tenants/tenants.component';
+import { isLoggedGuard } from 'src/app/core/guards/is-logged/is-logged.guard';
 
 const routes: Routes = [
   {
@@ -20,17 +21,19 @@ const routes: Routes = [
       {
         path: 'applications',
         component: ApplicationsComponent,
-        canActivate: [systemAdminGuard],
+        canActivate: [isLoggedGuard, systemAdminGuard],
       },
       {
         path: 'tenants',
         component: TenantsComponent,
+        canActivate: [isLoggedGuard],
         // Any logged user can view tenants (they see only their tenants)
         // System admins can create new tenants
       },
       {
         path: 'roles/:tenantId',
         component: RolesComponent,
+        canActivate: [isLoggedGuard],
         // Any tenant member can view roles
         // Only tenant admins can manage roles
       },
@@ -44,7 +47,7 @@ const routes: Routes = [
       },
       {
         path: 'profile',
-        // canActivate: [isLoggedGuard],
+        canActivate: [isLoggedGuard],
         loadChildren: () =>
           import('../profile/profile.module').then((m) => m.ProfileModule),
       },
@@ -57,4 +60,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class DashboardRoutingModule {}
+export class DashboardRoutingModule { }
