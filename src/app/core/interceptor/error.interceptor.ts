@@ -18,7 +18,7 @@ export class ErrorInterceptor implements HttpInterceptor {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly sessionStorageService: SessionStorageService,
-  ) {}
+  ) { }
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler,
@@ -41,10 +41,10 @@ export class ErrorInterceptor implements HttpInterceptor {
               position: 'bottom-right',
               description: 'Vuelva a inciar sesion.',
             });
-              const url = this.router.url
-              this.sessionStorageService.saveLastUrl(url)
-              this.sessionStorageService.removeAccessToken()
-              this.router.navigateByUrl('auth/sign-in');
+            const url = this.router.url
+            this.sessionStorageService.saveLastUrl(url)
+            this.sessionStorageService.removeAccessToken()
+            this.router.navigateByUrl('/auth/sign-in');
           }
 
           if (
