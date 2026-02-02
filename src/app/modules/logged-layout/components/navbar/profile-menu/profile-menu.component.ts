@@ -7,7 +7,7 @@ import {
 } from '@angular/animations';
 import { NgClass, TitleCasePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AvatarModule } from 'ngx-avatars';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
@@ -52,23 +52,7 @@ import { ClickOutsideDirective } from '../../../../../shared/directives/click-ou
 })
 export class ProfileMenuComponent implements OnInit {
   public isOpen = false;
-  public profileMenu = [
-    {
-      title: 'Perfil',
-      icon: './assets/icons/heroicons/outline/user-circle.svg',
-      link: '/dashboard/profile',
-    },
-    // {
-    //   title: 'Configuración',
-    //   icon: './assets/icons/heroicons/outline/cog-6-tooth.svg',
-    //   link: '/settings',
-    // },
-    {
-      title: 'Cerrar sesión',
-      icon: './assets/icons/heroicons/outline/logout.svg',
-      link: '/auth/sign-out',
-    },
-  ];
+  public profileMenu: any[] = [];
 
   public themeColors = [
     {
@@ -107,6 +91,7 @@ export class ProfileMenuComponent implements OnInit {
   constructor(
     public themeService: ThemeService,
     private readonly authService: AuthService,
+    private readonly router: Router,
   ) {
     this.authService.getProfile().subscribe((res) => {
       if (res && res.user) {
@@ -114,6 +99,34 @@ export class ProfileMenuComponent implements OnInit {
           name: `${res.user.firstName} ${res.user.lastName}`,
           email: res.user.email,
         };
+      }
+    });
+
+    // Initialize menu actions
+    this.profileMenu = [
+      {
+        title: 'Perfil',
+        icon: './assets/icons/heroicons/outline/user-circle.svg',
+        link: '/dashboard/profile',
+        action: null,
+      },
+      {
+        title: 'Cerrar sesión',
+        icon: './assets/icons/heroicons/outline/logout.svg',
+        link: null,
+        action: () => this.logout(),
+      },
+    ];
+  }
+
+  logout() {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/auth/sign-in']);
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        this.router.navigate(['/auth/sign-in']);
       }
     });
   }
